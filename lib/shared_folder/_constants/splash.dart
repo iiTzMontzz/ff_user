@@ -24,7 +24,7 @@ class Splash extends StatelessWidget {
                 'Fur Fetch +',
                 style: TextStyle(
                   fontFamily: 'Muli',
-                  color: Colors.grey[600],
+                  color: Colors.blueAccent[400],
                   fontSize: 30,
                   fontWeight: FontWeight.w600,
                 ),
@@ -41,7 +41,7 @@ class Splash extends StatelessWidget {
               Text(
                 'Loading...',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: Colors.blue[200],
                   fontSize: 22,
                   fontFamily: 'Muli',
                   fontStyle: FontStyle.italic,
@@ -57,7 +57,7 @@ class Splash extends StatelessWidget {
                 animation: true,
                 percent: 1.0,
                 animationDuration: 2250,
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.blue[100],
                 progressColor: Colors.white,
               ),
             ],

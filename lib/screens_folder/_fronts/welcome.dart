@@ -1,4 +1,5 @@
 import 'package:ff_user/shared_folder/_buttons/default_button.dart';
+import 'package:ff_user/shared_folder/_buttons/trans_button.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/constants.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -54,7 +55,7 @@ class _WelcomeState extends State<Welcome> {
                             "TOKOTO",
                             style: TextStyle(
                               fontSize: getProportionateScreenWidth(36),
-                              color: kPrimaryColor,
+                              color: Colors.blueAccent[400],
                               fontWeight: FontWeight.bold,
                             ),
                           )),
@@ -93,11 +94,12 @@ class _WelcomeState extends State<Welcome> {
                               (index) => buildDot(index: index),
                             ),
                           )),
-                      Spacer(flex: 3),
+                      Spacer(flex: 1),
                       FadeAnimation(
                           2.5,
                           DefaultButton(
                             text: "Continue",
+                            color: Colors.blue[400],
                             press: () {
                               Navigator.of(context).pop();
                               Navigator.of(context).push(MaterialPageRoute(
@@ -105,7 +107,17 @@ class _WelcomeState extends State<Welcome> {
                                       Splash(route: '/login')));
                             },
                           )),
-                      Spacer(),
+                      SizedBox(height: getProportionateScreenHeight(10)),
+                      FadeAnimation(
+                          2.5,
+                          TransparentButton(
+                            text: "Return",
+                            press: () {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/getstarted');
+                            },
+                          )),
+                      SizedBox(height: getProportionateScreenHeight(30)),
                     ],
                   ),
                 ),
@@ -124,7 +136,7 @@ class _WelcomeState extends State<Welcome> {
       height: 6,
       width: currentPage == index ? 20 : 6,
       decoration: BoxDecoration(
-        color: currentPage == index ? kPrimaryColor : Color(0xFFD8D8D8),
+        color: currentPage == index ? Colors.blueAccent : Color(0xFFD8D8D8),
         borderRadius: BorderRadius.circular(3),
       ),
     );

@@ -1,16 +1,14 @@
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:flutter/material.dart';
 
-class DefaultButton extends StatelessWidget {
-  const DefaultButton({
+class TransparentButton extends StatelessWidget {
+  final String text;
+  final Function press;
+  const TransparentButton({
     Key key,
     this.text,
     this.press,
-    this.color,
   }) : super(key: key);
-  final String text;
-  final Function press;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -19,13 +17,13 @@ class DefaultButton extends StatelessWidget {
       height: getProportionateScreenHeight(56),
       child: FlatButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: color,
+        color: Colors.transparent,
         onPressed: press,
         child: Text(
           text,
           style: TextStyle(
             fontSize: getProportionateScreenWidth(18),
-            color: Colors.white,
+            color: Colors.blue,
           ),
         ),
       ),
