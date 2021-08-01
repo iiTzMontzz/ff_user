@@ -36,6 +36,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -80,8 +81,9 @@ class _LoginState extends State<Login> {
                               press: () {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
-                                  // if all are valid then go to success screen
                                   KeyboardUtil.hideKeyboard(context);
+                                  Navigator.of(context)
+                                      .pushReplacementNamed('/signup');
                                 }
                               },
                             )),
