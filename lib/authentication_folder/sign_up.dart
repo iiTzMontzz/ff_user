@@ -68,6 +68,8 @@ class _SignupState extends State<Signup> {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
                               KeyboardUtil.hideKeyboard(context);
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/landingpage');
                             }
                           },
                         ),

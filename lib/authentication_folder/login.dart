@@ -69,7 +69,7 @@ class _LoginState extends State<Login> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        FadeAnimation(2.2, buildEmailFormField()),
+                        FadeAnimation(2.2, buildPhoneNumberFormField()),
                         SizedBox(height: getProportionateScreenHeight(50)),
                         FormError(errors: errors),
                         SizedBox(height: getProportionateScreenHeight(50)),
@@ -111,24 +111,19 @@ class _LoginState extends State<Login> {
     );
   }
 
-  TextFormField buildEmailFormField() {
+  TextFormField buildPhoneNumberFormField() {
     return TextFormField(
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.phone,
       onSaved: (newValue) => phone = newValue,
       onChanged: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kEmailNullError);
-        } else if (emailValidatorRegExp.hasMatch(value)) {
-          removeError(error: kInvalidEmailError);
+          removeError(error: kPhoneNumberNullError);
         }
         return null;
       },
       validator: (value) {
-        if (value.isEmpty) {
-          addError(error: kEmailNullError);
-          return "";
-        } else if (!emailValidatorRegExp.hasMatch(value)) {
-          addError(error: kInvalidEmailError);
+        if (value.isEmpty || value.length != 10) {
+          addError(error: kPhoneNumberNullError);
           return "";
         }
         return null;
@@ -136,8 +131,6 @@ class _LoginState extends State<Login> {
       decoration: InputDecoration(
         labelText: "Phone Number",
         hintText: "9XXXXXXXXX",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Phone.svg"),
       ),
