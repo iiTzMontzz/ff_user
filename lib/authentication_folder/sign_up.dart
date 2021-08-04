@@ -1,10 +1,14 @@
+import 'package:ff_user/models_folder/user.dart';
+import 'package:ff_user/services_folder/_database/data.dart';
 import 'package:ff_user/shared_folder/_buttons/default_button.dart';
 import 'package:ff_user/shared_folder/_buttons/keyboard.dart';
 import 'package:ff_user/shared_folder/_constants/constants.dart';
 import 'package:ff_user/shared_folder/_constants/custom_surfix_icon.dart';
 import 'package:ff_user/shared_folder/_constants/form_error.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -14,8 +18,10 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
-  String fullname;
-  String email;
+  var _fullname = TextEditingController();
+  var _email = TextEditingController();
+  String _status = 'Enabled';
+  String _type = 'Passenger';
 
   void addError({String error}) {
     if (!errors.contains(error))
@@ -31,8 +37,24 @@ class _SignupState extends State<Signup> {
       });
   }
 
+  void register(String uid, phone) async {
+    try {
+      if (uid != null) {
+        DatabaseReference dbref =
+            FirebaseDatabase.instance.reference().child('users/$uid');
+        Map userMap = {
+          'Email': _email.text,
+          'FullName': _fullname.text,
+          'phone': phone,
+        };
+        dbref.set(userMap);
+      }
+    } catch (e) {}
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
     SizeConfig().init(context);
     return Scaffold(
       body: SafeArea(
@@ -64,12 +86,20 @@ class _SignupState extends State<Signup> {
                         DefaultButton(
                           text: "continue",
                           color: Colors.blue[400],
-                          press: () {
+                          press: () async {
                             if (_formKey.currentState.validate()) {
                               _formKey.currentState.save();
                               KeyboardUtil.hideKeyboard(context);
-                              Navigator.of(context)
-                                  .pushReplacementNamed('/landingpage');
+                              dynamic result = await Data(uid: user.uid)
+                                  .addPassenger(_email.text, _fullname.text,
+                                      user.phone, _status);
+                              if (result == null) {
+                                await Data(uid: user.uid)
+                                    .addPerson(_type, _status);
+                                register(user.uid, user.phone);
+                                Navigator.of(context)
+                                    .pushReplacementNamed('/wrapper');
+                              }
                             }
                           },
                         ),
@@ -93,7 +123,7 @@ class _SignupState extends State<Signup> {
 
   TextFormField buildFullname() {
     return TextFormField(
-      onSaved: (newValue) => fullname = newValue,
+      controller: _fullname,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kNamelNullError);
@@ -119,7 +149,7 @@ class _SignupState extends State<Signup> {
   TextFormField buildEmail() {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
-      onSaved: (newValue) => email = newValue,
+      controller: _email,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kEmailNullError);

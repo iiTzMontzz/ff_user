@@ -7,7 +7,7 @@ class Splash extends StatelessWidget {
   Splash({this.route});
   @override
   Widget build(BuildContext context) {
-    Timer(Duration(milliseconds: 2500), () {
+    Timer(Duration(milliseconds: 3500), () {
       Navigator.of(context).pushReplacementNamed(route);
     });
 

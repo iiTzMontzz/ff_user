@@ -5,7 +5,10 @@ import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/constants.dart';
 import 'package:ff_user/shared_folder/_constants/custom_surfix_icon.dart';
 import 'package:ff_user/shared_folder/_constants/form_error.dart';
+import 'package:ff_user/shared_folder/_constants/progressDialog.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
+import 'package:ff_user/wrapper_folder/wrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -15,7 +18,9 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  String phone;
+  final _phonecontroller = TextEditingController();
+  final _codeController = TextEditingController();
+  String _start = '+63';
 
   bool remember = false;
   final List<String> errors = [];
@@ -78,12 +83,19 @@ class _LoginState extends State<Login> {
                             DefaultButton(
                               text: "Continue",
                               color: Colors.blue[400],
-                              press: () {
+                              press: () async {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
                                   KeyboardUtil.hideKeyboard(context);
-                                  Navigator.of(context)
-                                      .pushReplacementNamed('/signup');
+                                  showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) =>
+                                          ProgressDialog(
+                                              status: 'Please Wait...'));
+
+                                  final phone = _phonecontroller.text.trim();
+                                  await verifyNumber(_start + phone);
                                 }
                               },
                             )),
@@ -114,7 +126,7 @@ class _LoginState extends State<Login> {
   TextFormField buildPhoneNumberFormField() {
     return TextFormField(
       keyboardType: TextInputType.phone,
-      onSaved: (newValue) => phone = newValue,
+      controller: _phonecontroller,
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: kPhoneNumberNullError);
@@ -135,5 +147,95 @@ class _LoginState extends State<Login> {
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Phone.svg"),
       ),
     );
+  }
+
+  Future verifyNumber(String phone) async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+
+    final PhoneVerificationCompleted vrifyCompleted =
+        (AuthCredential credential) async {
+      Navigator.of(context).pop();
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) =>
+              ProgressDialog(status: 'Please Wait...'));
+      AuthResult result = await _auth.signInWithCredential(credential);
+      FirebaseUser user = result.user;
+      if (user != null) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => Wrapper()));
+      } else {
+        Navigator.of(context).pop();
+        return null;
+      }
+    };
+
+    final PhoneVerificationFailed verifailed = (AuthException exception) {
+      print(exception.message);
+    };
+
+    final PhoneCodeSent codeSent =
+        (String verificationid, [int forceResendingtoken]) {
+      Navigator.of(context).pop();
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Enter Code:'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: _codeController,
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Submit'),
+                  style: TextButton.styleFrom(primary: Colors.blue),
+                  onPressed: () async {
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) =>
+                            ProgressDialog(status: 'Please Wait...'));
+                    AuthCredential credential = PhoneAuthProvider.getCredential(
+                        verificationId: verificationid,
+                        smsCode: _codeController.text);
+                    AuthResult result =
+                        await _auth.signInWithCredential(credential);
+                    FirebaseUser user = result.user;
+
+                    if (user != null) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Wrapper()));
+                    } else {
+                      Navigator.of(context).pop();
+                      return null;
+                    }
+                  },
+                )
+              ],
+            );
+          });
+    };
+
+    _auth.verifyPhoneNumber(
+        phoneNumber: phone,
+        timeout: Duration(seconds: 60),
+        verificationCompleted: vrifyCompleted,
+        verificationFailed: verifailed,
+        codeSent: codeSent,
+        codeAutoRetrievalTimeout: null);
   }
 }
