@@ -4,9 +4,10 @@ import 'package:ff_user/models_folder/user.dart';
 import 'package:ff_user/screens_folder/_fronts/_landing/landingPage.dart';
 import 'package:ff_user/screens_folder/_fronts/get_started.dart';
 import 'package:ff_user/screens_folder/_fronts/welcome.dart';
-import 'package:ff_user/screens_folder/_pages/driver.dart';
-import 'package:ff_user/screens_folder/_pages/onReview.dart';
-import 'package:ff_user/screens_folder/_pages/profile.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/driver.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/onReview.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/profile.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/ride_request.dart';
 import 'package:ff_user/services_folder/_database/auth.dart';
 import 'package:ff_user/shared_folder/_constants/theme.dart';
 import 'package:ff_user/wrapper_folder/user_wrapper.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
           '/driver': (BuildContext context) => Driver(),
           '/onreview': (BuildContext context) => OnReview(),
           '/userwrapper': (BuildContext context) => UserWrapper(),
+          '/ridereq': (BuildContext context) => RideRequest(),
         },
       ),
     );
