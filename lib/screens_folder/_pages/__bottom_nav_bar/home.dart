@@ -1,4 +1,5 @@
 import 'package:ff_user/services_folder/_database/auth.dart';
+import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ class _HomeState extends State<Home> {
   final AuthService _auth = new AuthService();
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return SafeArea(
       child: SingleChildScrollView(
         child: Center(
