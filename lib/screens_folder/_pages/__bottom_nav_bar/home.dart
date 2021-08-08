@@ -1,3 +1,4 @@
+import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
 import 'package:flutter/material.dart';
@@ -24,66 +25,72 @@ class _HomeState extends State<Home> {
               SizedBox(height: getProportionateScreenWidth(20)),
               Padding(
                 padding: EdgeInsets.only(left: 20),
-                child: Text(
-                  "Fur Fetch +",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 28,
-                      fontFamily: 'Muli'),
-                ),
+                child: FadeAnimation(
+                    2.3,
+                    Text(
+                      "Fur Fetch +",
+                      style: TextStyle(
+                          color: Colors.blueAccent[700],
+                          fontWeight: FontWeight.w800,
+                          fontSize: 30,
+                          fontFamily: 'Muli'),
+                    )),
               ),
               SizedBox(height: getProportionateScreenHeight(20)),
               Padding(
                 padding: EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Category",
-                      style: TextStyle(
-                        fontFamily: 'Muli',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    Icon(
-                      Icons.more_horiz,
-                      color: Colors.grey[800],
-                    ),
-                  ],
-                ),
+                child: FadeAnimation(
+                    1,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Category",
+                          style: TextStyle(
+                            fontFamily: 'Muli',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        Icon(
+                          Icons.more_horiz,
+                          color: Colors.grey[800],
+                        ),
+                      ],
+                    )),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        buildPetCategory(
-                            category: 'Car',
-                            color: Colors.green,
-                            image: 'assets/images/jogging.png',
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      Splash(route: '/ridereq')));
-                            }),
-                        buildPetCategory(
-                            category: 'Pet Deliver',
-                            color: Colors.blue,
-                            image: 'assets/images/animals.png',
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      Splash(route: '/reciever')));
-                            })
-                      ],
-                    ),
+                    FadeAnimation(
+                        1.1,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            buildPetCategory(
+                                category: 'Car',
+                                color: Colors.green,
+                                image: 'assets/images/jogging.png',
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          Splash(route: '/ridereq')));
+                                }),
+                            buildPetCategory(
+                                category: 'Pet Deliver',
+                                color: Colors.blue,
+                                image: 'assets/images/animals.png',
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          Splash(route: '/reciever')));
+                                })
+                          ],
+                        )),
                   ],
                 ),
               ),
