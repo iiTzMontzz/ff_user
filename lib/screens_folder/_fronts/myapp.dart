@@ -5,8 +5,11 @@ import 'package:ff_user/screens_folder/_fronts/_landing/landingPage.dart';
 import 'package:ff_user/screens_folder/_fronts/get_started.dart';
 import 'package:ff_user/screens_folder/_fronts/welcome.dart';
 import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/driver.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/history.dart';
 import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/onReview.dart';
 import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/profile.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/wallet.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/pet_reciever.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/ride_request.dart';
 import 'package:ff_user/services_folder/_database/auth.dart';
 import 'package:ff_user/shared_folder/_constants/theme.dart';
@@ -32,12 +35,15 @@ class MyApp extends StatelessWidget {
           '/signup': (BuildContext context) => Signup(),
           '/getstarted': (BuildContext context) => GetStarted(),
           '/profile': (BuildContext context) => Profile(),
+          '/wallet': (BuildContext context) => Wallet(),
+          '/history': (BuildContext context) => History(),
           '/landingpage': (BuildContext context) => LandingPage(),
           '/wrapper': (BuildContext context) => Wrapper(),
           '/driver': (BuildContext context) => Driver(),
           '/onreview': (BuildContext context) => OnReview(),
           '/userwrapper': (BuildContext context) => UserWrapper(),
           '/ridereq': (BuildContext context) => RideRequest(),
+          '/petreciever': (BuildContext context) => PetReciever(),
         },
       ),
     );
