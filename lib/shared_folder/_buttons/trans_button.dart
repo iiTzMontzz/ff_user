@@ -24,6 +24,7 @@ class TransparentButton extends StatelessWidget {
           style: TextStyle(
             fontSize: getProportionateScreenWidth(18),
             color: Colors.blue,
+            fontFamily: 'Muli',
           ),
         ),
       ),

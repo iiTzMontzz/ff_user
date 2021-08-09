@@ -30,10 +30,11 @@ class _HomeState extends State<Home> {
                     Text(
                       "Fur Fetch +",
                       style: TextStyle(
-                          color: Colors.blueAccent[700],
-                          fontWeight: FontWeight.w800,
-                          fontSize: 30,
-                          fontFamily: 'Muli'),
+                        color: Colors.blueAccent[700],
+                        fontWeight: FontWeight.w800,
+                        fontSize: 30,
+                        fontFamily: 'Muli',
+                      ),
                     )),
               ),
               SizedBox(height: getProportionateScreenHeight(20)),

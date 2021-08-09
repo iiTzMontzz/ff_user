@@ -19,6 +19,7 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final GlobalKey<ScaffoldState> scaffoldkey = new GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final List<String> errors = [];
   final _auth = AuthService();
@@ -27,6 +28,17 @@ class _SignupState extends State<Signup> {
   String _status = 'Enabled';
   String _type = 'Passenger';
   bool loading = false;
+
+  void showSnackBar(String title) {
+    final snackbar = SnackBar(
+      content: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18, fontFamily: 'Muli'),
+      ),
+    );
+    scaffoldkey.currentState.showSnackBar(snackbar);
+  }
 
   void addError({String error}) {
     if (!errors.contains(error))
@@ -54,7 +66,9 @@ class _SignupState extends State<Signup> {
         };
         dbref.set(userMap);
       }
-    } catch (e) {}
+    } catch (e) {
+      showSnackBar(e);
+    }
   }
 
   @override
@@ -64,6 +78,7 @@ class _SignupState extends State<Signup> {
     return loading
         ? Loading()
         : Scaffold(
+            key: scaffoldkey,
             body: SafeArea(
               child: SizedBox(
                 width: double.infinity,
@@ -99,6 +114,7 @@ class _SignupState extends State<Signup> {
                                 press: () async {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();
+
                                     setState(() {
                                       loading = true;
                                     });

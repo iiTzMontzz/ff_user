@@ -17,6 +17,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final GlobalKey<ScaffoldState> scaffoldkey = new GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final _phonecontroller = TextEditingController();
   final _codeController = TextEditingController();
@@ -24,6 +25,17 @@ class _LoginState extends State<Login> {
 
   bool remember = false;
   final List<String> errors = [];
+
+  void showSnackBar(String title) {
+    final snackbar = SnackBar(
+      content: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18, fontFamily: 'Muli'),
+      ),
+    );
+    scaffoldkey.currentState.showSnackBar(snackbar);
+  }
 
   void addError({String error}) {
     if (!errors.contains(error))
@@ -43,6 +55,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
+      key: scaffoldkey,
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
@@ -164,10 +177,7 @@ class _LoginState extends State<Login> {
       FirebaseUser user = result.user;
       if (user != null) {
         Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => Wrapper()));
+        Navigator.of(context).pushReplacementNamed('/wrapper');
       } else {
         Navigator.of(context).pop();
         return null;
@@ -175,7 +185,7 @@ class _LoginState extends State<Login> {
     };
 
     final PhoneVerificationFailed verifailed = (AuthException exception) {
-      print(exception.message);
+      showSnackBar("Wrong Code Try Again");
     };
 
     final PhoneCodeSent codeSent =
