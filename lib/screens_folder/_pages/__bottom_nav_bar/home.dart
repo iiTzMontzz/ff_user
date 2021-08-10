@@ -30,8 +30,8 @@ class _HomeState extends State<Home> {
                     Text(
                       "Fur Fetch +",
                       style: TextStyle(
-                        color: Colors.blueAccent[700],
-                        fontWeight: FontWeight.w800,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
                         fontSize: 30,
                         fontFamily: 'Muli',
                       ),
