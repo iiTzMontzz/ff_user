@@ -1,4 +1,5 @@
 import 'package:ff_user/models_folder/user.dart';
+import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_database/auth.dart';
 import 'package:ff_user/screens_folder/_fronts/routes.dart';
 import 'package:ff_user/shared_folder/_constants/theme.dart';
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         StreamProvider<User>.value(value: AuthService().user),
+        ChangeNotifierProvider(create: (context) => AppData()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
