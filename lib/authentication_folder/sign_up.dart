@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:ff_user/models_folder/user.dart';
 import 'package:ff_user/services_folder/_database/auth.dart';
 import 'package:ff_user/services_folder/_database/data.dart';
@@ -114,6 +115,14 @@ class _SignupState extends State<Signup> {
                                 press: () async {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();
+                                    var connResult = await Connectivity()
+                                        .checkConnectivity();
+                                    if (connResult !=
+                                            ConnectivityResult.mobile &&
+                                        connResult != ConnectivityResult.wifi) {
+                                      showSnackBar("Check Internet Connection");
+                                      return;
+                                    }
 
                                     setState(() {
                                       loading = true;

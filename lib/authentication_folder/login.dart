@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:ff_user/shared_folder/_buttons/default_button.dart';
 import 'package:ff_user/shared_folder/_buttons/keyboard.dart';
 import 'package:ff_user/shared_folder/_buttons/trans_button.dart';
@@ -100,6 +101,13 @@ class _LoginState extends State<Login> {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
                                   KeyboardUtil.hideKeyboard(context);
+                                  var connResult =
+                                      await Connectivity().checkConnectivity();
+                                  if (connResult != ConnectivityResult.mobile &&
+                                      connResult != ConnectivityResult.wifi) {
+                                    showSnackBar("Check Internet Connection");
+                                    return;
+                                  }
                                   showDialog(
                                       context: context,
                                       barrierDismissible: false,
