@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
+import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:provider/provider.dart';
 
 class RideRequest extends StatefulWidget {
   final String rideType;
@@ -279,5 +281,15 @@ class _RideRequestState extends State<RideRequest> {
     CameraPosition cp = new CameraPosition(target: pos, zoom: 16);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
     await HelperMethod.findCoordinateAddress(position, context);
+  }
+
+  //Getting Direction Drawing Polylines
+  Future<void> getDirections() async {
+    var pickUp = Provider.of<AppData>(context, listen: false).pickupAddress;
+    var destination =
+        Provider.of<AppData>(context, listen: false).destinationAddress;
+
+    var pickupLatLng = LatLng(pickUp.lat, pickUp.lng);
+    var destinationLatLng = LatLng(destination.lat, destination.lng);
   }
 }

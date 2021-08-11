@@ -8,6 +8,7 @@ final CameraPosition initialPosition = CameraPosition(
 );
 FirebaseUser currentuser;
 UserData currentUserinfo;
+String servertoken = '';
 
 const placesprediction =
     'https://maps.googleapis.com/maps/api/place/details/json?placeid=placesidhere&key=androidID';

@@ -13,7 +13,8 @@ class PetShopTile extends StatelessWidget {
   PetShopTile({this.petStore});
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return FlatButton(
+      padding: EdgeInsets.all(0),
       onPressed: () {
         getPlaceDetails(petStore.placeID, context);
       },

@@ -29,7 +29,7 @@ class ProgressDialog extends StatelessWidget {
                 Text(
                   status,
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                  maxLines: 1,
                   style: TextStyle(
                       fontFamily: 'Muli',
                       fontSize: getProportionateScreenHeight(18)),

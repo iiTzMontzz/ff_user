@@ -16,6 +16,7 @@ class UserTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlatButton(
+      padding: EdgeInsets.all(0),
       onPressed: () {
         getPlaceDetails(predictions.placeID, context);
       },
@@ -87,9 +88,6 @@ class UserTile extends StatelessWidget {
 
       Provider.of<AppData>(context, listen: false)
           .updateDestinationAddress(thisPlace);
-      print(
-          'HELOO >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ' +
-              thisPlace.placename);
 
       Navigator.of(context).pop('getDirections');
     }

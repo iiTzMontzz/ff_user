@@ -15,7 +15,8 @@ class VetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
+    return FlatButton(
+      padding: EdgeInsets.all(0),
       onPressed: () {
         getPlaceDetails(vet.placeID, context);
       },
