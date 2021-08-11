@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -171,7 +173,11 @@ class _RideRequestState extends State<RideRequest> {
                         ),
                         SizedBox(width: getProportionateScreenWidth(12)),
                         GestureDetector(
-                          onTap: () async {},
+                          onTap: () async {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    VetSearch()));
+                          },
                           child: Container(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +216,11 @@ class _RideRequestState extends State<RideRequest> {
                         ),
                         SizedBox(width: getProportionateScreenWidth(12)),
                         GestureDetector(
-                          onTap: () async {},
+                          onTap: () async {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    PetStoreSearch()));
+                          },
                           child: Container(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

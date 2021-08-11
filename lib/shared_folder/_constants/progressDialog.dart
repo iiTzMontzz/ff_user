@@ -1,3 +1,4 @@
+import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:flutter/material.dart';
 
 class ProgressDialog extends StatelessWidget {
@@ -20,16 +21,18 @@ class ProgressDialog extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             child: Row(
               children: [
-                SizedBox(width: 5.0),
+                SizedBox(width: getProportionateScreenWidth(5)),
                 CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[400]),
                 ),
-                SizedBox(width: 25.0),
+                SizedBox(width: getProportionateScreenWidth(25)),
                 Text(
                   status,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
-                  style: TextStyle(fontFamily: 'Muli', fontSize: 18),
+                  style: TextStyle(
+                      fontFamily: 'Muli',
+                      fontSize: getProportionateScreenHeight(18)),
                 )
               ],
             ),

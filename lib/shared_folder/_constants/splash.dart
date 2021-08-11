@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -18,37 +19,37 @@ class Splash extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: 120,
+                height: getProportionateScreenHeight(120),
               ),
               Text(
                 'Fur Fetch +',
                 style: TextStyle(
                   fontFamily: 'Muli',
                   color: Colors.blueAccent[400],
-                  fontSize: 30,
+                  fontSize: getProportionateScreenHeight(30),
                   fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(
-                height: 20,
+                height: getProportionateScreenHeight(20),
               ),
               Container(
-                  height: 260,
+                  height: getProportionateScreenHeight(260),
                   child: Image(image: AssetImage('assets/images/dog.gif'))),
               SizedBox(
-                height: 15,
+                height: getProportionateScreenHeight(15),
               ),
               Text(
                 'Loading...',
                 style: TextStyle(
                   color: Colors.blue[200],
-                  fontSize: 22,
+                  fontSize: getProportionateScreenHeight(22),
                   fontFamily: 'Muli',
                   fontStyle: FontStyle.italic,
                 ),
               ),
               SizedBox(
-                height: 150,
+                height: getProportionateScreenHeight(150),
               ),
               LinearPercentIndicator(
                 alignment: MainAxisAlignment.center,
