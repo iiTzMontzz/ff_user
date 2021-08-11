@@ -11,11 +11,11 @@ UserData currentUserinfo;
 
 const placesprediction =
     'https://maps.googleapis.com/maps/api/place/details/json?placeid=placesidhere&key=androidID';
-
 const autocomplete =
     'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=placename&location=7.1907,125.4553&radius=49436.8284&key=androidID&sessiontoken={uuid.v4()}&components=country:ph&regions=postal_code:8000';
-
 const geocode =
     'https://maps.googleapis.com/maps/api/geocode/json?latlng={position.latitude},{position.longitude}&key=androidID';
 const directions =
     'https://maps.googleapis.com/maps/api/directions/json?origin={startPosition.latitude},{startPosition.longitude}&destination={endPosition.latitude},{endPosition.longitude}&mode=driving&key=apiKey';
+const nearbysearch =
+    'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={position.latitude},{position.longitude}&radius=2000&type=pet_store&key=apiKey';

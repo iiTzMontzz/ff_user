@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -110,7 +111,7 @@ class _RideRequestState extends State<RideRequest> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 5),
+                    SizedBox(height: getProportionateScreenHeight(5)),
                     Text(
                       'Hey There!',
                       style: TextStyle(
@@ -118,7 +119,7 @@ class _RideRequestState extends State<RideRequest> {
                           fontSize: 12,
                           fontWeight: FontWeight.w400),
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: getProportionateScreenHeight(5)),
                     Text(
                       'Where are we heading?',
                       style: TextStyle(
@@ -126,9 +127,12 @@ class _RideRequestState extends State<RideRequest> {
                           fontSize: 20,
                           fontWeight: FontWeight.w600),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: getProportionateScreenHeight(20)),
                     GestureDetector(
-                      onTap: () async {},
+                      onTap: () async {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (BuildContext context) => UserSearch()));
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -148,7 +152,7 @@ class _RideRequestState extends State<RideRequest> {
                                 Icons.search,
                                 color: Colors.blueAccent,
                               ),
-                              SizedBox(width: 10),
+                              SizedBox(width: getProportionateScreenWidth(10)),
                               Text(
                                 'Input Destination',
                                 style: TextStyle(fontFamily: 'Muli'),
@@ -158,14 +162,14 @@ class _RideRequestState extends State<RideRequest> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: getProportionateScreenHeight(20)),
                     Row(
                       children: [
                         Icon(
                           OMIcons.pets,
                           color: Colors.grey,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: getProportionateScreenWidth(12)),
                         GestureDetector(
                           onTap: () async {},
                           child: Container(
@@ -175,14 +179,17 @@ class _RideRequestState extends State<RideRequest> {
                                 Text(
                                   'Veterinary',
                                   style: TextStyle(
-                                      fontFamily: 'Muli', fontSize: 16),
+                                      fontFamily: 'Muli',
+                                      fontSize:
+                                          getProportionateScreenHeight(16)),
                                 ),
-                                SizedBox(height: 3),
+                                SizedBox(
+                                    height: getProportionateScreenHeight(3)),
                                 Text(
                                   'Pick veterinary near you',
                                   style: TextStyle(
                                     fontFamily: 'Muli',
-                                    fontSize: 12,
+                                    fontSize: getProportionateScreenHeight(12),
                                     color: Colors.grey[400],
                                   ),
                                 )
@@ -192,16 +199,16 @@ class _RideRequestState extends State<RideRequest> {
                         )
                       ],
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: getProportionateScreenHeight(10)),
                     CustomDivider(),
-                    SizedBox(height: 10),
+                    SizedBox(height: getProportionateScreenHeight(10)),
                     Row(
                       children: [
                         Icon(
                           OMIcons.shop,
                           color: Colors.grey,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: getProportionateScreenWidth(12)),
                         GestureDetector(
                           onTap: () async {},
                           child: Container(
@@ -211,14 +218,17 @@ class _RideRequestState extends State<RideRequest> {
                                 Text(
                                   'Pet Shop',
                                   style: TextStyle(
-                                      fontFamily: 'Muli', fontSize: 16),
+                                      fontFamily: 'Muli',
+                                      fontSize:
+                                          getProportionateScreenHeight(16)),
                                 ),
-                                SizedBox(height: 3),
+                                SizedBox(
+                                    height: getProportionateScreenHeight(3)),
                                 Text(
                                   'Pick pet shop near you',
                                   style: TextStyle(
                                     fontFamily: 'Muli',
-                                    fontSize: 12,
+                                    fontSize: getProportionateScreenHeight(12),
                                     color: Colors.grey[400],
                                   ),
                                 )
@@ -228,7 +238,7 @@ class _RideRequestState extends State<RideRequest> {
                         )
                       ],
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: getProportionateScreenHeight(10)),
                     CustomDivider(),
                   ],
                 ),
@@ -258,10 +268,6 @@ class _RideRequestState extends State<RideRequest> {
     LatLng pos = LatLng(position.latitude, position.longitude);
     CameraPosition cp = new CameraPosition(target: pos, zoom: 16);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
-    String address =
-        await HelperMethod.findCoordinateAddress(position, context);
-    print(
-        "ADRESS DIRI NAA DIRII >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" +
-            address);
+    await HelperMethod.findCoordinateAddress(position, context);
   }
 }
