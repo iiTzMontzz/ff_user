@@ -366,7 +366,7 @@ class _RideRequestState extends State<RideRequest> {
         northeast: destinationLatLng,
       );
     }
-    mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
+    mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 90));
     //Markers
     Marker pickupMarker = Marker(
       markerId: MarkerId('pickup'),
@@ -401,7 +401,7 @@ class _RideRequestState extends State<RideRequest> {
       strokeWidth: 3,
       radius: 12,
       center: destinationLatLng,
-      fillColor: Colors.purpleAccent,
+      fillColor: Colors.redAccent[700],
     );
 
     setState(() {
