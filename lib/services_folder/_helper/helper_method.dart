@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:ff_user/models_folder/user_data.dart';
 import 'package:ff_user/shared_folder/_global/glob_var.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity/connectivity.dart';
 import 'package:ff_user/models_folder/address.dart';
@@ -13,6 +16,22 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HelperMethod {
+  //Get user Information
+  static void getcurrentUserInfo() async {
+    currentuser = await FirebaseAuth.instance.currentUser();
+    String uid = currentuser.uid;
+
+    DatabaseReference userRef =
+        FirebaseDatabase.instance.reference().child('users/$uid');
+    userRef.once().then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        currentUserinfo = UserData.fromSnapshot(snapshot);
+        print('HELOOO MY NAME ISSSSSS>>>>>>>>>>>>>>>>>>>' +
+            currentUserinfo.fullname);
+      }
+    });
+  }
+
   //Getting the formated address from the http request of current address
   static Future<String> findCoordinateAddress(
       Position position, context) async {
@@ -68,9 +87,8 @@ class HelperMethod {
     double baseFare = 40;
     double perKm = (directionDetails.distanceValue / 100) * 3;
     double perMin = (directionDetails.durationValue / 60) * 2;
-    double booking = 40;
 
-    double totalFare = baseFare + perKm + perMin + booking;
+    double totalFare = baseFare + perKm + perMin;
     return totalFare.truncate();
   }
 
