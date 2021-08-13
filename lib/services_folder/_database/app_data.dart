@@ -1,5 +1,5 @@
 import 'package:ff_user/models_folder/address.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/pet_reciever.dart';
+import 'package:ff_user/models_folder/reciever_information.dart';
 import 'package:flutter/material.dart';
 
 class AppData extends ChangeNotifier {
