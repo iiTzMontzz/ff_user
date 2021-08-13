@@ -49,7 +49,6 @@ class _RideRequestState extends State<RideRequest>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     HelperMethod.getcurrentUserInfo();
   }
@@ -488,7 +487,7 @@ class _RideRequestState extends State<RideRequest>
                       GestureDetector(
                         onTap: () {
                           //Cancel Request
-                          resetapp();
+                          cancelRequest();
                         },
                         child: Container(
                           height: getProportionateScreenHeight(50),
@@ -701,9 +700,7 @@ class _RideRequestState extends State<RideRequest>
 //Create Trip Request in database
   void createTripRequest() {
     tripRef = FirebaseDatabase.instance.reference().child('rideRequest').push();
-
     var pickup = Provider.of<AppData>(context, listen: false).pickupAddress;
-
     var destination =
         Provider.of<AppData>(context, listen: false).destinationAddress;
 
@@ -733,5 +730,11 @@ class _RideRequestState extends State<RideRequest>
 
     tripRef.set(tripMap);
     tripRef.onValue.listen((event) async {});
+  }
+
+  //Cancel TripRequest
+  void cancelRequest() {
+    tripRef.remove();
+    resetapp();
   }
 }
