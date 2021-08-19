@@ -732,6 +732,7 @@ class _RideRequestState extends State<RideRequest>
       'destination': destinationMap,
       'payment_method': 'Cash',
       'driver_id': 'pending',
+      'ride_type': widget.rideType,
       'status': 'Pending',
     };
 
