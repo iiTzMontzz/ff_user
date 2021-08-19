@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:ff_user/models_folder/direction_details.dart';
+import 'package:ff_user/models_folder/nearby_drivers.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
+import 'package:ff_user/services_folder/_helper/fire_helper.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_buttons/main_button.dart';
@@ -13,6 +15,7 @@ import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_global/glob_var.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -34,6 +37,7 @@ class _RideRequestState extends State<RideRequest>
   GoogleMapController mapController;
   Position currentPosition;
   DirectionDetails tripDirectionDetails;
+  BitmapDescriptor nearbyDriverIcon;
   DatabaseReference tripRef;
   List<LatLng> polylineCoordinates = [];
   Set<Polyline> _polylines = {};
@@ -45,6 +49,7 @@ class _RideRequestState extends State<RideRequest>
   double loadingTrip = 0;
   bool showTopnavi = true;
   bool isRequest = true;
+  bool nearbyKeyisLoaded = false;
   var geolocator = Geolocator();
 
   @override
@@ -55,6 +60,7 @@ class _RideRequestState extends State<RideRequest>
 
   @override
   Widget build(BuildContext context) {
+    createMarker();
     return Scaffold(
       body: Stack(
         children: [
@@ -584,6 +590,7 @@ class _RideRequestState extends State<RideRequest>
     CameraPosition cp = new CameraPosition(target: pos, zoom: 16);
     mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
     await HelperMethod.findCoordinateAddress(position, context);
+    startGeofireListener();
   }
 
   //Getting Direction Drawing Polylines
@@ -736,5 +743,90 @@ class _RideRequestState extends State<RideRequest>
   void cancelRequest() {
     tripRef.remove();
     resetapp();
+  }
+
+//Getting Nearby Drivers using Geofire
+  void startGeofireListener() {
+    Geofire.initialize('availableDrivers');
+    Geofire.queryAtLocation(
+            currentPosition.latitude, currentPosition.longitude, 30)
+        .listen((map) {
+      print(
+          'GEOFIRE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ONLINE');
+      print(map);
+      if (map != null) {
+        var callBack = map['callBack'];
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+        switch (callBack) {
+          case Geofire.onKeyEntered:
+            NearbyDriver nearbyDriver = NearbyDriver();
+            nearbyDriver.key = map['key'];
+            nearbyDriver.lat = map['latitude'];
+            nearbyDriver.lng = map['longitude'];
+            FireHelper.nearbyDriverlist.add(nearbyDriver);
+            if (nearbyKeyisLoaded) {
+              updateDriversOnmap();
+            }
+            break;
+
+          case Geofire.onKeyExited:
+            FireHelper.removeFromlist(map['key']);
+            updateDriversOnmap();
+            break;
+
+          case Geofire.onKeyMoved:
+            // Update your key's / Drivers location
+            NearbyDriver nearbyDriver = NearbyDriver();
+            nearbyDriver.key = map['key'];
+            nearbyDriver.lat = map['latitude'];
+            nearbyDriver.lng = map['longitude'];
+            FireHelper.updateNearbyLocation(nearbyDriver);
+            updateDriversOnmap();
+            break;
+
+          case Geofire.onGeoQueryReady:
+            // All Intial Data is loaded
+            nearbyKeyisLoaded = true;
+            updateDriversOnmap();
+            print('FIREHLEPR LENGHT: ${FireHelper.nearbyDriverlist.length}');
+            break;
+        }
+      }
+    });
+  }
+
+  //updating drivers on map
+  void updateDriversOnmap() {
+    setState(() {
+      _markers.clear();
+    });
+    Set<Marker> tempoMarker = Set<Marker>();
+    for (NearbyDriver driver in FireHelper.nearbyDriverlist) {
+      LatLng driverPos = LatLng(driver.lat, driver.lng);
+      Marker thisMarker = Marker(
+        markerId: MarkerId('driver${driver.key}'),
+        position: driverPos,
+        icon: nearbyDriverIcon,
+        rotation: HelperMethod.numberGenerator(360),
+      );
+      tempoMarker.add(thisMarker);
+    }
+    setState(() {
+      _markers = tempoMarker;
+    });
+  }
+
+  //Create Moving Markers
+  void createMarker() {
+    if (nearbyDriverIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, 'assets/images/pawprint.png')
+          .then((icon) {
+        nearbyDriverIcon = icon;
+      });
+    }
   }
 }
