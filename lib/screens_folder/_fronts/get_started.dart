@@ -21,7 +21,7 @@ class GetStarted extends StatelessWidget {
                     FadeAnimation(
                         1,
                         Text(
-                          "Fur Fetch +",
+                          "Ehatid +",
                           style: TextStyle(
                             fontSize: getProportionateScreenWidth(36),
                             color: Colors.blue,

@@ -22,7 +22,7 @@ class Splash extends StatelessWidget {
                 height: getProportionateScreenHeight(120),
               ),
               Text(
-                'Fur Fetch +',
+                'Ehatid +',
                 style: TextStyle(
                   fontFamily: 'Muli',
                   color: Colors.blueAccent[400],

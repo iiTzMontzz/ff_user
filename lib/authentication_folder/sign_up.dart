@@ -193,7 +193,7 @@ class _SignupState extends State<Signup> {
       },
       decoration: InputDecoration(
         labelText: "Full Name",
-        hintText: "John Doe",
+        hintText: "Full Name",
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
       ),

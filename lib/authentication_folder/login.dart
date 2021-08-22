@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
                   FadeAnimation(
                       2,
                       Text(
-                        "Sign in with your email and password  \nor continue with social media",
+                        "Sign in with Phone Number",
                         textAlign: TextAlign.center,
                       )),
                   SizedBox(height: SizeConfig.screenHeight * 0.12),
