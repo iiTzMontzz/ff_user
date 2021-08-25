@@ -5,6 +5,7 @@ import 'package:ff_user/models_folder/nearby_drivers.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/no_driver_available.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/fire_helper.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
@@ -40,11 +41,12 @@ class _RideRequestState extends State<RideRequest>
   BitmapDescriptor nearbyDriverIcon;
   DatabaseReference tripRef;
   List<LatLng> polylineCoordinates = [];
+  List<NearbyDriver> availableDrivers;
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
   double mapPadding = 0;
-  double searchSheet = 285;
+  double searchSheet = 300;
   double tripDetailSheet = 0;
   double loadingTrip = 0;
   bool showTopnavi = true;
@@ -430,6 +432,8 @@ class _RideRequestState extends State<RideRequest>
                           color: Colors.blue[400],
                           onpress: () {
                             showLoadingTrip();
+                            availableDrivers = FireHelper.nearbyDriverlist;
+                            findDriver();
                           },
                         ),
                       )
@@ -829,5 +833,27 @@ class _RideRequestState extends State<RideRequest>
         nearbyDriverIcon = icon;
       });
     }
+  }
+
+//Getting Driver
+  void findDriver() {
+    if (availableDrivers.length == 0) {
+      cancelRequest();
+      resetapp();
+      noDriverFound();
+      return;
+    }
+    var driver = availableDrivers[0];
+    // notifyDriver(driver);
+    availableDrivers.removeAt(0);
+    print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
+  }
+
+  //If No Driver/s is found
+  void noDriverFound() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => NoDriverAvailable());
   }
 }
