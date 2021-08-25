@@ -102,14 +102,12 @@ class HelperMethod {
 
 //Sending Request to Driver
   static void sendFcm(String token, context, String tripId) async {
-    var destination =
-        Provider.of<AppData>(context, listen: false).destinationAddress;
     Map<String, String> headerMap = {
       'Content-Type': 'application/json',
       'Authorization': servertoken,
     };
     Map notoficationMap = {
-      'body': 'Destination: ${destination.placename}',
+      'body': 'Click to View.',
       'title': 'New Trip Request',
     };
     Map dataMap = {

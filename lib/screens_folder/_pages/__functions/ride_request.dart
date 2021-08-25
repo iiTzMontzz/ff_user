@@ -754,11 +754,8 @@ class _RideRequestState extends State<RideRequest>
   void startGeofireListener() {
     Geofire.initialize('availableDrivers');
     Geofire.queryAtLocation(
-            currentPosition.latitude, currentPosition.longitude, 30)
+            currentPosition.latitude, currentPosition.longitude, 5)
         .listen((map) {
-      print(
-          'GEOFIRE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ONLINE');
-      print(map);
       if (map != null) {
         var callBack = map['callBack'];
         //latitude will be retrieved from map['latitude']
@@ -844,7 +841,7 @@ class _RideRequestState extends State<RideRequest>
       return;
     }
     var driver = availableDrivers[0];
-    // notifyDriver(driver);
+    notifyDriver(driver);
     availableDrivers.removeAt(0);
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
   }
@@ -855,5 +852,31 @@ class _RideRequestState extends State<RideRequest>
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => NoDriverAvailable());
+  }
+
+//Notifying Driver
+  void notifyDriver(NearbyDriver nearbyDriver) {
+    DatabaseReference driverTripRef = FirebaseDatabase.instance
+        .reference()
+        .child('drivers/${nearbyDriver.key}/newTrip');
+    driverTripRef.set(tripRef.key);
+    //Getting Driver Token
+    DatabaseReference driverTokenref = FirebaseDatabase.instance
+        .reference()
+        .child('drivers/${nearbyDriver.key}/token');
+    driverTokenref.once().then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        String driverToken = snapshot.value.toString();
+        //Sending Notification to the selected Driver
+        HelperMethod.sendFcm(driverToken, context, tripRef.key);
+      } else {
+        return;
+      }
+      const oneSeckTick = Duration(seconds: 1);
+
+      var timer = Timer.periodic(oneSeckTick, (timer) {
+        //Stopping the timer when the Passenger cancelled the trip request
+      });
+    });
   }
 }
