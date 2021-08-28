@@ -32,7 +32,7 @@ class _UserSearchState extends State<UserSearch> {
       body: Column(
         children: [
           Container(
-            height: getProportionateScreenHeight(225),
+            height: getProportionateScreenHeight(240),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [

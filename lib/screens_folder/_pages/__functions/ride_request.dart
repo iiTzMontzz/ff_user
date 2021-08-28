@@ -14,6 +14,7 @@ import 'package:ff_user/shared_folder/_buttons/main_button.dart';
 import 'package:ff_user/shared_folder/_constants/progressDialog.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_global/glob_var.dart';
+import 'package:ff_user/shared_folder/_global/tripVariables.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
@@ -35,6 +36,7 @@ class RideRequest extends StatefulWidget {
 class _RideRequestState extends State<RideRequest>
     with TickerProviderStateMixin {
   Completer<GoogleMapController> _controller = Completer();
+  StreamSubscription<Event> tripSubscription;
   GoogleMapController mapController;
   Position currentPosition;
   DirectionDetails tripDirectionDetails;
@@ -45,13 +47,16 @@ class _RideRequestState extends State<RideRequest>
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
+  String appState = 'Normal';
   double mapPadding = 0;
-  double searchSheet = 300;
+  double searchSheet = 310;
   double tripDetailSheet = 0;
   double loadingTrip = 0;
+  double tripSheet = 0;
   bool showTopnavi = true;
   bool isRequest = true;
   bool nearbyKeyisLoaded = false;
+  bool isRequestingLocationDetails = false;
   var geolocator = Geolocator();
 
   @override
@@ -80,7 +85,7 @@ class _RideRequestState extends State<RideRequest>
             onMapCreated: onMapCreated,
           ),
 
-          //Top NAvigation
+          //Top NAvigation --------------------------------------->
           (showTopnavi)
               ? Positioned(
                   top: 44,
@@ -88,9 +93,8 @@ class _RideRequestState extends State<RideRequest>
                   child: GestureDetector(
                     onTap: () {
                       if (isRequest) {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                        Navigator.of(context).popAndPushNamed('/wrapper');
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushNamed('/wrapper');
                       } else {
                         //Second Argument RESET APP
                         resetapp();
@@ -124,7 +128,7 @@ class _RideRequestState extends State<RideRequest>
                   ),
                 ),
 
-          //Search Page Sheet
+          //Search Page Sheet ------------------------------------>
           Positioned(
             left: 0,
             right: 0,
@@ -154,161 +158,180 @@ class _RideRequestState extends State<RideRequest>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: getProportionateScreenHeight(5)),
-                      Text(
-                        'Hey There!',
-                        style: TextStyle(
-                            fontFamily: 'Muli',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(5)),
-                      Text(
-                        'Where are we heading?',
-                        style: TextStyle(
-                            fontFamily: 'Muli',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(20)),
-                      GestureDetector(
-                        onTap: () async {
-                          var response = await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      UserSearch()));
-                          if (response == 'getDirections') {
-                            showtripDetailsheet();
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 5.0,
-                                    spreadRadius: 0.5,
-                                    offset: Offset(0.7, 0.7))
-                              ]),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: getProportionateScreenHeight(5)),
+                            Text(
+                              'Hey There!',
+                              style: TextStyle(
+                                  fontFamily: 'Muli',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(5)),
+                            Text(
+                              'Where are we heading?',
+                              style: TextStyle(
+                                  fontFamily: 'Muli',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(20)),
+                            GestureDetector(
+                              onTap: () async {
+                                var response = await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            UserSearch()));
+                                if (response == 'getDirections') {
+                                  showtripDetailsheet();
+                                }
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 5.0,
+                                          spreadRadius: 0.5,
+                                          offset: Offset(0.7, 0.7))
+                                    ]),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.search,
+                                        color: Colors.blueAccent,
+                                      ),
+                                      SizedBox(
+                                          width:
+                                              getProportionateScreenWidth(10)),
+                                      Text(
+                                        'Input Destination',
+                                        style: TextStyle(fontFamily: 'Muli'),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(20)),
+                            Row(
                               children: [
                                 Icon(
-                                  Icons.search,
-                                  color: Colors.blueAccent,
+                                  OMIcons.pets,
+                                  color: Colors.grey,
                                 ),
                                 SizedBox(
-                                    width: getProportionateScreenWidth(10)),
-                                Text(
-                                  'Input Destination',
-                                  style: TextStyle(fontFamily: 'Muli'),
+                                    width: getProportionateScreenWidth(12)),
+                                GestureDetector(
+                                  onTap: () async {
+                                    var response = await Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                VetSearch()));
+                                    if (response == 'NearestVet') {
+                                      showtripDetailsheet();
+                                    }
+                                  },
+                                  child: Container(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Veterinary',
+                                          style: TextStyle(
+                                              fontFamily: 'Muli',
+                                              fontSize:
+                                                  getProportionateScreenHeight(
+                                                      16)),
+                                        ),
+                                        SizedBox(
+                                            height:
+                                                getProportionateScreenHeight(
+                                                    3)),
+                                        Text(
+                                          'Pick veterinary near you',
+                                          style: TextStyle(
+                                            fontFamily: 'Muli',
+                                            fontSize:
+                                                getProportionateScreenHeight(
+                                                    12),
+                                            color: Colors.grey[400],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 )
                               ],
                             ),
-                          ),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            CustomDivider(),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            Row(
+                              children: [
+                                Icon(
+                                  OMIcons.shop,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(
+                                    width: getProportionateScreenWidth(12)),
+                                GestureDetector(
+                                  onTap: () async {
+                                    var response = await Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                PetStoreSearch()));
+                                    if (response == 'PetStore') {
+                                      showtripDetailsheet();
+                                    }
+                                  },
+                                  child: Container(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Pet Shop',
+                                          style: TextStyle(
+                                              fontFamily: 'Muli',
+                                              fontSize:
+                                                  getProportionateScreenHeight(
+                                                      16)),
+                                        ),
+                                        SizedBox(
+                                            height:
+                                                getProportionateScreenHeight(
+                                                    3)),
+                                        Text(
+                                          'Pick pet shop near you',
+                                          style: TextStyle(
+                                            fontFamily: 'Muli',
+                                            fontSize:
+                                                getProportionateScreenHeight(
+                                                    12),
+                                            color: Colors.grey[400],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            CustomDivider(),
+                          ],
                         ),
                       ),
-                      SizedBox(height: getProportionateScreenHeight(20)),
-                      Row(
-                        children: [
-                          Icon(
-                            OMIcons.pets,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(width: getProportionateScreenWidth(12)),
-                          GestureDetector(
-                            onTap: () async {
-                              var response = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          VetSearch()));
-                              if (response == 'NearestVet') {
-                                showtripDetailsheet();
-                              }
-                            },
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Veterinary',
-                                    style: TextStyle(
-                                        fontFamily: 'Muli',
-                                        fontSize:
-                                            getProportionateScreenHeight(16)),
-                                  ),
-                                  SizedBox(
-                                      height: getProportionateScreenHeight(3)),
-                                  Text(
-                                    'Pick veterinary near you',
-                                    style: TextStyle(
-                                      fontFamily: 'Muli',
-                                      fontSize:
-                                          getProportionateScreenHeight(12),
-                                      color: Colors.grey[400],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      CustomDivider(),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      Row(
-                        children: [
-                          Icon(
-                            OMIcons.shop,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(width: getProportionateScreenWidth(12)),
-                          GestureDetector(
-                            onTap: () async {
-                              var response = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          PetStoreSearch()));
-                              if (response == 'PetStore') {
-                                showtripDetailsheet();
-                              }
-                            },
-                            child: Container(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Pet Shop',
-                                    style: TextStyle(
-                                        fontFamily: 'Muli',
-                                        fontSize:
-                                            getProportionateScreenHeight(16)),
-                                  ),
-                                  SizedBox(
-                                      height: getProportionateScreenHeight(3)),
-                                  Text(
-                                    'Pick pet shop near you',
-                                    style: TextStyle(
-                                      fontFamily: 'Muli',
-                                      fontSize:
-                                          getProportionateScreenHeight(12),
-                                      color: Colors.grey[400],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(10)),
-                      CustomDivider(),
                     ],
                   ),
                 ),
@@ -316,7 +339,7 @@ class _RideRequestState extends State<RideRequest>
             ),
           ),
 
-          //Trip Detail SHeet
+          //Trip Detail SHeet ------------------------------------>
           Positioned(
             left: 0,
             right: 0,
@@ -345,98 +368,118 @@ class _RideRequestState extends State<RideRequest>
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   child: Column(
                     children: [
-                      Container(
-                        width: double.infinity,
-                        color: Colors.green[100],
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/man-carrying-a-dog-with-a-belt-to-walk.png',
-                                height: getProportionateScreenHeight(50),
-                                width: getProportionateScreenWidth(50),
-                              ),
-                              SizedBox(width: getProportionateScreenWidth(16)),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (tripDirectionDetails != null)
-                                        ? tripDirectionDetails.durationText
-                                        : '',
-                                    style: TextStyle(
-                                      fontFamily: 'Muli',
-                                      fontSize:
-                                          getProportionateScreenHeight(20),
-                                      fontWeight: FontWeight.w600,
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              color: Colors.green[100],
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/man-carrying-a-dog-with-a-belt-to-walk.png',
+                                      height: getProportionateScreenHeight(50),
+                                      width: getProportionateScreenWidth(50),
                                     ),
-                                  ),
-                                  Text(
-                                    (tripDirectionDetails != null)
-                                        ? tripDirectionDetails.distanceText
-                                        : '',
-                                    style: TextStyle(
-                                      fontFamily: 'Muli',
-                                      fontSize:
-                                          getProportionateScreenHeight(26),
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.grey,
+                                    SizedBox(
+                                        width: getProportionateScreenWidth(16)),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          (tripDirectionDetails != null)
+                                              ? tripDirectionDetails
+                                                  .durationText
+                                              : '',
+                                          style: TextStyle(
+                                            fontFamily: 'Muli',
+                                            fontSize:
+                                                getProportionateScreenHeight(
+                                                    20),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          (tripDirectionDetails != null)
+                                              ? tripDirectionDetails
+                                                  .distanceText
+                                              : '',
+                                          style: TextStyle(
+                                            fontFamily: 'Muli',
+                                            fontSize:
+                                                getProportionateScreenHeight(
+                                                    26),
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Expanded(child: Container()),
-                              Text(
-                                (tripDirectionDetails != null)
-                                    ? 'Php${HelperMethod.estimatedFare(tripDirectionDetails)}'
-                                    : '',
-                                style: TextStyle(
-                                  fontFamily: 'Muli',
-                                  fontSize: getProportionateScreenHeight(20),
-                                  fontWeight: FontWeight.w600,
+                                    Expanded(child: Container()),
+                                    Text(
+                                      (tripDirectionDetails != null)
+                                          ? 'Php${HelperMethod.estimatedFare(tripDirectionDetails)}'
+                                          : '',
+                                      style: TextStyle(
+                                        fontFamily: 'Muli',
+                                        fontSize:
+                                            getProportionateScreenHeight(20),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(22)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.moneyBillAlt,
-                              size: getProportionateScreenHeight(18),
-                              color: Colors.green[400],
                             ),
-                            SizedBox(width: getProportionateScreenWidth(16)),
-                            Text(
-                              'Cash',
-                              style: TextStyle(fontFamily: 'Muli'),
+                            SizedBox(height: getProportionateScreenHeight(22)),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.moneyBillAlt,
+                                    size: getProportionateScreenHeight(18),
+                                    color: Colors.green[400],
+                                  ),
+                                  SizedBox(
+                                      width: getProportionateScreenWidth(16)),
+                                  Text(
+                                    'Cash',
+                                    style: TextStyle(fontFamily: 'Muli'),
+                                  ),
+                                  SizedBox(
+                                      width: getProportionateScreenWidth(5)),
+                                  Icon(Icons.keyboard_arrow_down,
+                                      color: Colors.grey,
+                                      size: getProportionateScreenHeight(16)),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: getProportionateScreenWidth(5)),
-                            Icon(Icons.keyboard_arrow_down,
-                                color: Colors.grey,
-                                size: getProportionateScreenHeight(16)),
+                            SizedBox(height: getProportionateScreenHeight(30)),
+                            //------>//Button for Driver Request
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16.0),
+                              child: MainButton(
+                                title: 'Proceed',
+                                color: Colors.blue[400],
+                                onpress: () {
+                                  setState(() {
+                                    appState = 'Requesting';
+                                  });
+                                  showLoadingTrip();
+                                  availableDrivers =
+                                      FireHelper.nearbyDriverlist;
+                                  findDriver();
+                                },
+                              ),
+                            )
                           ],
                         ),
                       ),
-                      SizedBox(height: getProportionateScreenHeight(30)),
-                      //------>//Button for Driver Request
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: MainButton(
-                          title: 'Proceed',
-                          color: Colors.blue[400],
-                          onpress: () {
-                            showLoadingTrip();
-                            availableDrivers = FireHelper.nearbyDriverlist;
-                            findDriver();
-                          },
-                        ),
-                      )
                     ],
                   ),
                 ),
@@ -444,7 +487,7 @@ class _RideRequestState extends State<RideRequest>
             ),
           ),
 
-          //Finding Driver Sheet
+          //Finding Driver Sheet --------------------------------->
           Positioned(
             left: 0,
             right: 0,
@@ -476,55 +519,241 @@ class _RideRequestState extends State<RideRequest>
                     vertical: 18,
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(height: getProportionateScreenHeight(20)),
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextLiquidFill(
-                          text: 'Finding Your Driver.....',
-                          waveColor: Colors.greenAccent[400],
-                          boxBackgroundColor: Colors.white,
-                          textStyle: TextStyle(
-                            fontSize: getProportionateScreenHeight(24),
-                            fontFamily: 'Muli',
-                            fontWeight: FontWeight.bold,
-                          ),
-                          boxHeight: getProportionateScreenHeight(40),
-                        ),
-                      ),
-                      SizedBox(height: getProportionateScreenHeight(20)),
-                      GestureDetector(
-                        onTap: () {
-                          //Cancel Request
-                          cancelRequest();
-                        },
-                        child: Container(
-                          height: getProportionateScreenHeight(50),
-                          width: getProportionateScreenWidth(50),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            border: Border.all(
-                              width: 1.0,
-                              color: Colors.grey,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(height: getProportionateScreenHeight(20)),
+                            SizedBox(
+                              width: double.infinity,
+                              child: TextLiquidFill(
+                                text: 'Finding Your Driver.....',
+                                waveColor: Colors.greenAccent[400],
+                                boxBackgroundColor: Colors.white,
+                                textStyle: TextStyle(
+                                  fontSize: getProportionateScreenHeight(24),
+                                  fontFamily: 'Muli',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                boxHeight: getProportionateScreenHeight(40),
+                              ),
                             ),
-                          ),
-                          child: Icon(Icons.close, size: 25),
+                            SizedBox(height: getProportionateScreenHeight(20)),
+                            GestureDetector(
+                              onTap: () {
+                                //Cancel Request
+                                cancelRequest();
+                              },
+                              child: Container(
+                                height: getProportionateScreenHeight(50),
+                                width: getProportionateScreenWidth(50),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25),
+                                  border: Border.all(
+                                    width: 1.0,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                child: Icon(Icons.close, size: 25),
+                              ),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(15)),
+                            Container(
+                              width: double.infinity,
+                              child: Text(
+                                'Cancel',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Muli',
+                                  fontSize: getProportionateScreenHeight(14),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                      SizedBox(height: getProportionateScreenHeight(15)),
-                      Container(
-                        width: double.infinity,
-                        child: Text(
-                          'Cancel',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Muli',
-                            fontSize: getProportionateScreenHeight(14),
-                          ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          //Trip Detail Sheet ------------------------------------>
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AnimatedSize(
+              vsync: this,
+              duration: new Duration(milliseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                height: getProportionateScreenHeight(tripSheet),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 15,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7, 0.7),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 18,
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: getProportionateScreenHeight(5)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  tripStatusDisplay,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'Muli',
+                                    fontSize: getProportionateScreenHeight(20),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            CustomDivider(),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            Text(
+                              carDetails,
+                              style: TextStyle(
+                                fontFamily: 'Muli',
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Text(
+                              driverName,
+                              style: TextStyle(
+                                fontFamily: 'Muli',
+                                fontSize: getProportionateScreenHeight(20),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            CustomDivider(),
+                            SizedBox(height: getProportionateScreenHeight(10)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                //Call
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: getProportionateScreenHeight(50),
+                                      width: getProportionateScreenWidth(50),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(25)),
+                                        border: Border.all(
+                                          width: 1.0,
+                                          color: Colors.grey[400],
+                                        ),
+                                      ),
+                                      child: Icon(Icons.call),
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            getProportionateScreenHeight(10)),
+                                    Text(
+                                      'Call',
+                                      style: TextStyle(
+                                          fontFamily: 'Muli',
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                                //Driver Info
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: getProportionateScreenHeight(50),
+                                      width: getProportionateScreenWidth(50),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(25)),
+                                        border: Border.all(
+                                          width: 1.0,
+                                          color: Colors.grey[400],
+                                        ),
+                                      ),
+                                      child: Icon(Icons.list),
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            getProportionateScreenHeight(10)),
+                                    Text(
+                                      'Driver Info',
+                                      style: TextStyle(
+                                          fontFamily: 'Muli',
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                                //Cancel
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        tripRef.child('status').set('Canceled');
+                                        resetapp();
+                                      },
+                                      child: Container(
+                                        height:
+                                            getProportionateScreenHeight(50),
+                                        width: getProportionateScreenWidth(50),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(25)),
+                                          border: Border.all(
+                                            width: 1.0,
+                                            color: Colors.grey[400],
+                                          ),
+                                        ),
+                                        child: Icon(OMIcons.clear),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            getProportionateScreenHeight(10)),
+                                    Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                          fontFamily: 'Muli',
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -552,9 +781,18 @@ class _RideRequestState extends State<RideRequest>
     await getDirections();
     setState(() {
       searchSheet = 0;
-      tripDetailSheet = 225;
-      mapPadding = 225;
+      tripDetailSheet = 240;
+      mapPadding = 240;
       isRequest = false;
+    });
+  }
+
+//Trip sheet UI
+  void showTripsheet() {
+    setState(() {
+      loadingTrip = 0;
+      tripSheet = 310;
+      mapPadding = 310;
     });
   }
 
@@ -567,10 +805,11 @@ class _RideRequestState extends State<RideRequest>
       _circles.clear();
       tripDetailSheet = 0;
       loadingTrip = 0;
-      searchSheet = 285;
-      mapPadding = 285;
+      searchSheet = 310;
+      mapPadding = 310;
       isRequest = true;
       showTopnavi = true;
+      tripSheet = 0;
     });
     setupPositionLocator();
   }
@@ -580,7 +819,7 @@ class _RideRequestState extends State<RideRequest>
     _controller.complete(controller);
     mapController = controller;
     setState(() {
-      mapPadding = getProportionateScreenHeight(285);
+      mapPadding = getProportionateScreenHeight(310);
     });
     setupPositionLocator();
   }
@@ -741,13 +980,114 @@ class _RideRequestState extends State<RideRequest>
     };
 
     tripRef.set(tripMap);
-    tripRef.onValue.listen((event) async {});
+
+    tripSubscription = tripRef.onValue.listen((event) async {
+      //Checking if event is null
+      if (event.snapshot.value == null) {
+        return;
+      }
+      //get Details
+      if (event.snapshot.value['vehicle_detail'] != null) {
+        setState(() {
+          carDetails = event.snapshot.value['vehicle_detail'].toString();
+        });
+      }
+      //Get Driver Name
+      if (event.snapshot.value['driver_name'] != null) {
+        setState(() {
+          driverName = event.snapshot.value['driver_name'].toString();
+        });
+      }
+      //Get Driver Phone
+      if (event.snapshot.value['driver_phone'] != null) {
+        setState(() {
+          driverPhone = event.snapshot.value['driver_phone'].toString();
+        });
+      }
+      //Check if status is not null
+      if (event.snapshot.value['status'] != null) {
+        setState(() {
+          status = event.snapshot.value['status'].toString();
+        });
+      }
+      //Get and use Driver Location
+      if (event.snapshot.value['driver_location'] != null) {
+        double driverLat = double.parse(
+            event.snapshot.value['driver_location']['lat'].toString());
+        double driverLng = double.parse(
+            event.snapshot.value['driver_location']['lng'].toString());
+        LatLng driverLocation = LatLng(driverLat, driverLng);
+        if (status == 'Accepted') {
+          updateToPickup(driverLocation);
+        } else if (status == 'Arrived') {
+          setState(() {
+            tripStatusDisplay = 'Driver has arrived';
+          });
+        } else if (status == 'OnTrip') {
+          updateToDestination(driverLocation);
+        }
+      }
+
+      if (status == 'Accepted') {
+        showTripsheet();
+        Geofire.stopListener();
+        removeGeofireMarkers();
+      }
+    });
+  }
+
+  //Removing Markers on the map
+  void removeGeofireMarkers() {
+    setState(() {
+      _markers.removeWhere((m) => m.markerId.value.contains('driver'));
+    });
+  }
+
+//Updatting to destination time
+  void updateToDestination(LatLng driverLocation) async {
+    if (!isRequestingLocationDetails) {
+      isRequestingLocationDetails = true;
+      var destination =
+          Provider.of<AppData>(context, listen: false).destinationAddress;
+      var destinationLatLng = LatLng(destination.lat, destination.lng);
+      var thisDetails = await HelperMethod.getDirectionDetails(
+          driverLocation, destinationLatLng);
+      if (thisDetails == null) {
+        return;
+      }
+      setState(() {
+        tripStatusDisplay = 'Arrival Time - ${thisDetails.durationText}';
+      });
+      isRequestingLocationDetails = false;
+    }
+  }
+
+  //Update to Pick up location time
+  void updateToPickup(LatLng driverLocation) async {
+    if (!isRequestingLocationDetails) {
+      isRequestingLocationDetails = true;
+      var positionLatLng =
+          LatLng(currentPosition.latitude, currentPosition.longitude);
+      var thisDetails = await HelperMethod.getDirectionDetails(
+          driverLocation, positionLatLng);
+      if (thisDetails == null) {
+        return;
+      }
+      setState(() {
+        tripStatusDisplay =
+            'Drivers Arrival Time - ${thisDetails.durationText}';
+      });
+      isRequestingLocationDetails = false;
+    }
   }
 
   //Cancel TripRequest
   void cancelRequest() {
     tripRef.remove();
     resetapp();
+    setState(() {
+      appState = 'Normal';
+    });
   }
 
 //Getting Nearby Drivers using Geofire
@@ -873,9 +1213,31 @@ class _RideRequestState extends State<RideRequest>
         return;
       }
       const oneSeckTick = Duration(seconds: 1);
-
-      var timer = Timer.periodic(oneSeckTick, (timer) {
+      Timer.periodic(oneSeckTick, (timer) {
         //Stopping the timer when the Passenger cancelled the trip request
+        if (appState != 'Requesting') {
+          driverTripRef.set('Canceled');
+          driverTripRef.onDisconnect();
+          timer.cancel();
+          driverRequestTimedOut = 10;
+        }
+        driverRequestTimedOut--;
+        //If the Driver Accepts the Request
+        driverTripRef.onValue.listen((event) {
+          if (event.snapshot.value.toString() == 'Accepted') {
+            driverTripRef.onDisconnect();
+            timer.cancel();
+            driverRequestTimedOut = 10;
+          }
+        });
+        if (driverRequestTimedOut == 0) {
+          driverTripRef.set('timeout');
+          driverTripRef.onDisconnect();
+          driverRequestTimedOut = 10;
+          timer.cancel();
+          //Find New Driver'
+          findDriver();
+        }
       });
     });
   }
