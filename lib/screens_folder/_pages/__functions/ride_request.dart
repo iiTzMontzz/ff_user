@@ -6,6 +6,7 @@ import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_sear
 import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/no_driver_available.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/payments_dialog.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/fire_helper.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
@@ -810,6 +811,12 @@ class _RideRequestState extends State<RideRequest>
       isRequest = true;
       showTopnavi = true;
       tripSheet = 0;
+
+      status = '';
+      driverName = '';
+      driverPhone = '';
+      carDetails = '';
+      tripStatusDisplay = 'Driver is Arriving';
     });
     setupPositionLocator();
   }
@@ -1030,14 +1037,31 @@ class _RideRequestState extends State<RideRequest>
 
       if (status == 'Accepted') {
         showTripsheet();
-        Geofire.stopListener();
         removeGeofireMarkers();
+      }
+      if (status == 'Ended') {
+        if (event.snapshot.value['fare'] != null) {
+          int fare = int.parse(event.snapshot.value['fare'].toString());
+          var resposne = await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) => PaymentsDialog(fare: fare));
+
+          if (resposne == 'close') {
+            tripRef.onDisconnect();
+            tripRef = null;
+            tripSubscription.cancel();
+            tripSubscription = null;
+            resetapp();
+          }
+        }
       }
     });
   }
 
   //Removing Markers on the map
   void removeGeofireMarkers() {
+    Geofire.stopListener();
     setState(() {
       _markers.removeWhere((m) => m.markerId.value.contains('driver'));
     });
