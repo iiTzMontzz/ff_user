@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
                 child: FadeAnimation(
                     2.3,
                     Text(
-                      "Fur Fetch +",
+                      "Ehatid +",
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
@@ -71,7 +71,7 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             buildPetCategory(
-                                category: 'Car',
+                                category: 'New Trip',
                                 color: Colors.green,
                                 image: 'assets/images/jogging.png',
                                 onTap: () {
@@ -81,7 +81,7 @@ class _HomeState extends State<Home> {
                                           Splash(route: '/ridereq')));
                                 }),
                             buildPetCategory(
-                                category: 'Pet Deliver',
+                                category: 'Pet',
                                 color: Colors.blue,
                                 image: 'assets/images/animals.png',
                                 onTap: () {

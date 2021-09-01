@@ -32,7 +32,7 @@ class GetStarted extends StatelessWidget {
                     FadeAnimation(
                         1.4,
                         Image.asset(
-                          "assets/images/pet.gif",
+                          "assets/images/logo.png",
                           height: getProportionateScreenHeight(265),
                           width: getProportionateScreenWidth(235),
                         )),

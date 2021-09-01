@@ -848,10 +848,8 @@ class _RideRequestState extends State<RideRequest>
     var pickUp = Provider.of<AppData>(context, listen: false).pickupAddress;
     var destination =
         Provider.of<AppData>(context, listen: false).destinationAddress;
-
     var pickupLatLng = LatLng(pickUp.lat, pickUp.lng);
     var destinationLatLng = LatLng(destination.lat, destination.lng);
-
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -960,17 +958,14 @@ class _RideRequestState extends State<RideRequest>
     var pickup = Provider.of<AppData>(context, listen: false).pickupAddress;
     var destination =
         Provider.of<AppData>(context, listen: false).destinationAddress;
-
     Map pickupMap = {
       'lat': pickup.lat.toString(),
       'lng': pickup.lng.toString(),
     };
-
     Map destinationMap = {
       'lat': destination.lat.toString(),
       'lng': destination.lng.toString(),
     };
-
     Map tripMap = {
       'date_created': DateTime.now().toString(),
       'passenger_id': currentuser.uid,
@@ -985,9 +980,7 @@ class _RideRequestState extends State<RideRequest>
       'ride_type': widget.rideType,
       'status': 'Pending',
     };
-
     tripRef.set(tripMap);
-
     tripSubscription = tripRef.onValue.listen((event) async {
       //Checking if event is null
       if (event.snapshot.value == null) {
@@ -1034,7 +1027,7 @@ class _RideRequestState extends State<RideRequest>
           updateToDestination(driverLocation);
         }
       }
-
+      //if Status is accepted
       if (status == 'Accepted') {
         showTripsheet();
         removeGeofireMarkers();

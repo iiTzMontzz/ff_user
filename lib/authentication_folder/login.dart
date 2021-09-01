@@ -70,18 +70,12 @@ class _LoginState extends State<Login> {
                   FadeAnimation(
                       2,
                       Text(
-                        "Welcome Back",
+                        "Phone Authentication",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: getProportionateScreenWidth(28),
                           fontWeight: FontWeight.bold,
                         ),
-                      )),
-                  FadeAnimation(
-                      2,
-                      Text(
-                        "Sign in with Phone Number",
-                        textAlign: TextAlign.center,
                       )),
                   SizedBox(height: SizeConfig.screenHeight * 0.12),
                   Form(

@@ -14,15 +14,9 @@ class Welcome extends StatefulWidget {
 class _WelcomeState extends State<Welcome> {
   int currentPage = 0;
   List<Map<String, String>> splashData = [
-    {"text": "Welcome to Ehatid", "image": "assets/images/splash_1.png"},
-    {
-      "text": "Pharagraph_1 \nPharagraph_1",
-      "image": "assets/images/splash_2.png"
-    },
-    {
-      "text": "Pharagraph_2 \nPharagraph_2",
-      "image": "assets/images/splash_3.png"
-    },
+    {"text": "Welcome to Ehatid", "image": "assets/images/logo.png"},
+    {"text": "Pharagraph_1 \nPharagraph_1", "image": "assets/images/logo.png"},
+    {"text": "Pharagraph_2 \nPharagraph_2", "image": "assets/images/logo.png"},
   ];
   @override
   Widget build(BuildContext context) {
