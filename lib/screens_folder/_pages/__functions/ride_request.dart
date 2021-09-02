@@ -952,6 +952,54 @@ class _RideRequestState extends State<RideRequest>
     });
   }
 
+//Getting Nearby Drivers using Geofire
+  void startGeofireListener() {
+    Geofire.initialize('availableDrivers');
+    Geofire.queryAtLocation(
+            currentPosition.latitude, currentPosition.longitude, 5)
+        .listen((map) {
+      if (map != null) {
+        var callBack = map['callBack'];
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+        switch (callBack) {
+          case Geofire.onKeyEntered:
+            NearbyDriver nearbyDriver = NearbyDriver();
+            nearbyDriver.key = map['key'];
+            nearbyDriver.lat = map['latitude'];
+            nearbyDriver.lng = map['longitude'];
+            FireHelper.nearbyDriverlist.add(nearbyDriver);
+            if (nearbyKeyisLoaded) {
+              updateDriversOnmap();
+            }
+            break;
+
+          case Geofire.onKeyExited:
+            FireHelper.removeFromlist(map['key']);
+            updateDriversOnmap();
+            break;
+
+          case Geofire.onKeyMoved:
+            // Update your key's / Drivers location
+            NearbyDriver nearbyDriver = NearbyDriver();
+            nearbyDriver.key = map['key'];
+            nearbyDriver.lat = map['latitude'];
+            nearbyDriver.lng = map['longitude'];
+            FireHelper.updateNearbyLocation(nearbyDriver);
+            updateDriversOnmap();
+            break;
+
+          case Geofire.onGeoQueryReady:
+            // All Intial Data is loaded
+            nearbyKeyisLoaded = true;
+            updateDriversOnmap();
+            print('FIREHLEPR LENGHT: ${FireHelper.nearbyDriverlist.length}');
+            break;
+        }
+      }
+    });
+  }
+
 //Create Trip Request in database
   void createTripRequest() {
     tripRef = FirebaseDatabase.instance.reference().child('rideRequest').push();
@@ -1030,6 +1078,8 @@ class _RideRequestState extends State<RideRequest>
       //if Status is accepted
       if (status == 'Accepted') {
         showTripsheet();
+        bool response = await Geofire.stopListener();
+        print("Geofire Status >>>>>>>>>> $response");
         removeGeofireMarkers();
       }
       if (status == 'Ended') {
@@ -1054,7 +1104,6 @@ class _RideRequestState extends State<RideRequest>
 
   //Removing Markers on the map
   void removeGeofireMarkers() {
-    Geofire.stopListener();
     setState(() {
       _markers.removeWhere((m) => m.markerId.value.contains('driver'));
     });
@@ -1107,59 +1156,12 @@ class _RideRequestState extends State<RideRequest>
     });
   }
 
-//Getting Nearby Drivers using Geofire
-  void startGeofireListener() {
-    Geofire.initialize('availableDrivers');
-    Geofire.queryAtLocation(
-            currentPosition.latitude, currentPosition.longitude, 5)
-        .listen((map) {
-      if (map != null) {
-        var callBack = map['callBack'];
-        //latitude will be retrieved from map['latitude']
-        //longitude will be retrieved from map['longitude']
-        switch (callBack) {
-          case Geofire.onKeyEntered:
-            NearbyDriver nearbyDriver = NearbyDriver();
-            nearbyDriver.key = map['key'];
-            nearbyDriver.lat = map['latitude'];
-            nearbyDriver.lng = map['longitude'];
-            FireHelper.nearbyDriverlist.add(nearbyDriver);
-            if (nearbyKeyisLoaded) {
-              updateDriversOnmap();
-            }
-            break;
-
-          case Geofire.onKeyExited:
-            FireHelper.removeFromlist(map['key']);
-            updateDriversOnmap();
-            break;
-
-          case Geofire.onKeyMoved:
-            // Update your key's / Drivers location
-            NearbyDriver nearbyDriver = NearbyDriver();
-            nearbyDriver.key = map['key'];
-            nearbyDriver.lat = map['latitude'];
-            nearbyDriver.lng = map['longitude'];
-            FireHelper.updateNearbyLocation(nearbyDriver);
-            updateDriversOnmap();
-            break;
-
-          case Geofire.onGeoQueryReady:
-            // All Intial Data is loaded
-            nearbyKeyisLoaded = true;
-            updateDriversOnmap();
-            print('FIREHLEPR LENGHT: ${FireHelper.nearbyDriverlist.length}');
-            break;
-        }
-      }
-    });
-  }
-
   //updating drivers on map
   void updateDriversOnmap() {
     setState(() {
       _markers.clear();
     });
+
     Set<Marker> tempoMarker = Set<Marker>();
     for (NearbyDriver driver in FireHelper.nearbyDriverlist) {
       LatLng driverPos = LatLng(driver.lat, driver.lng);
