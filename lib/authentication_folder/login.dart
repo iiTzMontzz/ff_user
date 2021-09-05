@@ -213,27 +213,37 @@ class _LoginState extends State<Login> {
                   child: Text('Submit'),
                   style: TextButton.styleFrom(primary: Colors.blue),
                   onPressed: () async {
-                    showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) =>
-                            ProgressDialog(status: 'Please Wait...'));
-                    AuthCredential credential = PhoneAuthProvider.getCredential(
-                        verificationId: verificationid,
-                        smsCode: _codeController.text);
-                    AuthResult result =
-                        await _auth.signInWithCredential(credential);
-                    FirebaseUser user = result.user;
+                    try {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) =>
+                              ProgressDialog(status: 'Please Wait...'));
+                      AuthCredential credential =
+                          PhoneAuthProvider.getCredential(
+                              verificationId: verificationid,
+                              smsCode: _codeController.text);
+                      AuthResult result =
+                          await _auth.signInWithCredential(credential);
+                      FirebaseUser user = result.user;
 
-                    if (user != null) {
+                      if (user != null) {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => Wrapper()));
+                      } else {
+                        Navigator.of(context).pop();
+                        return null;
+                      }
+                    } catch (e) {
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => Wrapper()));
-                    } else {
-                      Navigator.of(context).pop();
-                      return null;
+                      showSnackBar(e.message);
+                      setState(() {
+                        _codeController.clear();
+                      });
                     }
                   },
                 )

@@ -28,7 +28,8 @@ import 'package:provider/provider.dart';
 
 class RideRequest extends StatefulWidget {
   final String rideType;
-  const RideRequest({this.rideType});
+  final String carType;
+  const RideRequest({this.rideType, this.carType});
 
   @override
   _RideRequestState createState() => _RideRequestState();
@@ -189,6 +190,7 @@ class _RideRequestState extends State<RideRequest>
                                             UserSearch()));
                                 if (response == 'getDirections') {
                                   showtripDetailsheet();
+                                  startGeofireListener();
                                 }
                               },
                               child: Container(
@@ -798,7 +800,7 @@ class _RideRequestState extends State<RideRequest>
   }
 
   //Reset App
-  void resetapp() {
+  void resetapp() async {
     setState(() {
       polylineCoordinates.clear();
       _polylines.clear();
@@ -819,6 +821,8 @@ class _RideRequestState extends State<RideRequest>
       tripStatusDisplay = 'Driver is Arriving';
     });
     setupPositionLocator();
+    bool response = await Geofire.stopListener();
+    print("Reset App STOP LISTENER >>> $response");
   }
 
   //onMapCreated
@@ -828,19 +832,8 @@ class _RideRequestState extends State<RideRequest>
     setState(() {
       mapPadding = getProportionateScreenHeight(310);
     });
+    print('CAR TYPE >>>>>>>>>>>> ${widget.carType}');
     setupPositionLocator();
-  }
-
-  //Setting up current Location
-  void setupPositionLocator() async {
-    Position position = await geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
-    currentPosition = position;
-    LatLng pos = LatLng(position.latitude, position.longitude);
-    CameraPosition cp = new CameraPosition(target: pos, zoom: 16);
-    mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
-    await HelperMethod.findCoordinateAddress(position, context);
-    startGeofireListener();
   }
 
   //Getting Direction Drawing Polylines
@@ -952,9 +945,21 @@ class _RideRequestState extends State<RideRequest>
     });
   }
 
+  //Setting up current Location
+  void setupPositionLocator() async {
+    Position position = await geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
+    currentPosition = position;
+    LatLng pos = LatLng(position.latitude, position.longitude);
+    CameraPosition cp = new CameraPosition(target: pos, zoom: 16);
+    mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
+    await HelperMethod.findCoordinateAddress(position, context);
+  }
+
 //Getting Nearby Drivers using Geofire
   void startGeofireListener() {
-    Geofire.initialize('availableDrivers');
+    Geofire.initialize(widget.carType);
+    print('CAR TYPE >>>>>>>>>>>> ${widget.carType}');
     Geofire.queryAtLocation(
             currentPosition.latitude, currentPosition.longitude, 5)
         .listen((map) {
@@ -1161,7 +1166,6 @@ class _RideRequestState extends State<RideRequest>
     setState(() {
       _markers.clear();
     });
-
     Set<Marker> tempoMarker = Set<Marker>();
     for (NearbyDriver driver in FireHelper.nearbyDriverlist) {
       LatLng driverPos = LatLng(driver.lat, driver.lng);
@@ -1232,7 +1236,7 @@ class _RideRequestState extends State<RideRequest>
         return;
       }
       const oneSeckTick = Duration(seconds: 1);
-      Timer.periodic(oneSeckTick, (timer) {
+      Timer.periodic(oneSeckTick, (timer) async {
         //Stopping the timer when the Passenger cancelled the trip request
         if (appState != 'Requesting') {
           driverTripRef.set('Canceled');
@@ -1254,6 +1258,8 @@ class _RideRequestState extends State<RideRequest>
           driverTripRef.onDisconnect();
           driverRequestTimedOut = 10;
           timer.cancel();
+          bool response = await Geofire.stopListener();
+          print("NotifyDriver STOP LISTENER NOTIFY DRIVER >>> $response");
           //Find New Driver'
           findDriver();
         }

@@ -1,3 +1,4 @@
+import 'package:ff_user/screens_folder/_pages/__functions/car_type.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
@@ -71,15 +72,17 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             buildPetCategory(
-                                category: 'New Trip',
-                                color: Colors.green,
-                                image: 'assets/images/jogging.png',
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          Splash(route: '/ridereq')));
-                                }),
+                              category: 'New Trip',
+                              color: Colors.green,
+                              image: 'assets/images/jogging.png',
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) =>
+                                        CarType());
+                              },
+                            ),
                             buildPetCategory(
                                 category: 'Pet',
                                 color: Colors.blue,
