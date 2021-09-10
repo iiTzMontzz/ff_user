@@ -1,5 +1,5 @@
 import 'package:ff_user/models_folder/predictions.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/user_tile.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aDelux/_user/user_tile.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/request_helper.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';

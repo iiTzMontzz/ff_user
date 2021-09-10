@@ -1,3 +1,4 @@
+import 'package:ff_user/screens_folder/_pages/__functions/_aDelux/_user/userSplashDelux.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/userSplash.dart';
 import 'package:ff_user/shared_folder/_buttons/trans_button.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -27,7 +28,7 @@ class _CarTypeState extends State<CarType> {
       geoS = false;
     }
     if (geoMedium == null) {
-      geoMedium = true;
+      geoM = true;
     } else {
       geoM = false;
     }
@@ -78,7 +79,7 @@ class _CarTypeState extends State<CarType> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UserSplash(
+                    builder: (context) => UserSplashDelux(
                           carType: 'aDelux',
                           rideType: widget.rideType,
                           geostat: geoM,

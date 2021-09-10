@@ -203,6 +203,8 @@ class _RideRequestState extends State<RideRequest>
                                       startGeofire = false;
                                       geoSmall = false;
                                     });
+                                    print('GEOMEDIUM $geoMedium');
+                                    print('GEOLARGE $geoLarge');
                                   }
                                 }
                               },
@@ -260,6 +262,8 @@ class _RideRequestState extends State<RideRequest>
                                           startGeofire = false;
                                           geoSmall = false;
                                         });
+                                        print('GEOMEDIUM $geoMedium');
+                                        print('GEOLARGE $geoLarge');
                                       }
                                     }
                                   },
@@ -321,6 +325,8 @@ class _RideRequestState extends State<RideRequest>
                                           startGeofire = false;
                                           geoSmall = false;
                                         });
+                                        print('GEOMEDIUM $geoMedium');
+                                        print('GEOLARGE $geoLarge');
                                       }
                                     }
                                   },

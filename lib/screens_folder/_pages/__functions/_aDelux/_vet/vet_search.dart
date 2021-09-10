@@ -1,5 +1,5 @@
 import 'package:ff_user/models_folder/veterinary.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_tile.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aDelux/_vet/vet_tile.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/services_folder/_helper/request_helper.dart';
