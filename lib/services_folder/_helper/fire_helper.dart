@@ -6,7 +6,7 @@ class FireHelper {
   static void removeFromlist(String key) {
     int index = nearbyDriverlist.indexWhere((element) => element.key == key);
     nearbyDriverlist.removeAt(index);
-    print("Driver Removed >>>>> $index");
+    print("Driver Removed >>>>> $key");
   }
 
   static void updateNearbyLocation(NearbyDriver nearbyDriver) {

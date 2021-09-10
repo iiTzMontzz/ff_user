@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:ff_user/models_folder/direction_details.dart';
 import 'package:ff_user/models_folder/nearby_drivers.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/home/homeSplash.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
@@ -29,7 +30,8 @@ import 'package:provider/provider.dart';
 class RideRequest extends StatefulWidget {
   final String rideType;
   final String carType;
-  const RideRequest({this.rideType, this.carType});
+  final bool geostat;
+  const RideRequest({this.rideType, this.carType, this.geostat});
 
   @override
   _RideRequestState createState() => _RideRequestState();
@@ -59,12 +61,16 @@ class _RideRequestState extends State<RideRequest>
   bool isRequest = true;
   bool nearbyKeyisLoaded = false;
   bool isRequestingLocationDetails = false;
+  bool startGeofire;
   var geolocator = Geolocator();
 
   @override
   void initState() {
     super.initState();
     HelperMethod.getcurrentUserInfo();
+    setState(() {
+      startGeofire = widget.geostat;
+    });
   }
 
   @override
@@ -96,7 +102,9 @@ class _RideRequestState extends State<RideRequest>
                     onTap: () {
                       if (isRequest) {
                         Navigator.of(context).pop();
-                        Navigator.of(context).pushNamed('/wrapper');
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                HomeSplash(geostat: startGeofire)));
                       } else {
                         //Second Argument RESET APP
                         resetapp();
@@ -190,7 +198,12 @@ class _RideRequestState extends State<RideRequest>
                                             UserSearch()));
                                 if (response == 'getDirections') {
                                   showtripDetailsheet();
-                                  startGeofireListener();
+                                  if (startGeofire == true) {
+                                    startGeofireListener();
+                                    setState(() {
+                                      startGeofire = false;
+                                    });
+                                  }
                                 }
                               },
                               child: Container(
@@ -476,6 +489,7 @@ class _RideRequestState extends State<RideRequest>
                                   showLoadingTrip();
                                   availableDrivers =
                                       FireHelper.nearbyDriverlist;
+
                                   findDriver();
                                 },
                               ),
@@ -821,17 +835,16 @@ class _RideRequestState extends State<RideRequest>
       tripStatusDisplay = 'Driver is Arriving';
     });
     setupPositionLocator();
-    bool response = await Geofire.stopListener();
-    print("Reset App STOP LISTENER >>> $response");
   }
 
   //onMapCreated
-  void onMapCreated(GoogleMapController controller) {
+  void onMapCreated(GoogleMapController controller) async {
     _controller.complete(controller);
     mapController = controller;
     setState(() {
       mapPadding = getProportionateScreenHeight(310);
     });
+
     print('CAR TYPE >>>>>>>>>>>> ${widget.carType}');
     setupPositionLocator();
   }
@@ -965,8 +978,7 @@ class _RideRequestState extends State<RideRequest>
         .listen((map) {
       if (map != null) {
         var callBack = map['callBack'];
-        //latitude will be retrieved from map['latitude']
-        //longitude will be retrieved from map['longitude']
+
         switch (callBack) {
           case Geofire.onKeyEntered:
             NearbyDriver nearbyDriver = NearbyDriver();
@@ -976,12 +988,16 @@ class _RideRequestState extends State<RideRequest>
             FireHelper.nearbyDriverlist.add(nearbyDriver);
             if (nearbyKeyisLoaded) {
               updateDriversOnmap();
+              print(
+                  'FIREHLEPR Entered LENGHT: ${FireHelper.nearbyDriverlist.length}');
             }
             break;
 
           case Geofire.onKeyExited:
             FireHelper.removeFromlist(map['key']);
             updateDriversOnmap();
+            print(
+                'FIREHLEPR Exited LENGHT: ${FireHelper.nearbyDriverlist.length}');
             break;
 
           case Geofire.onKeyMoved:
@@ -992,13 +1008,16 @@ class _RideRequestState extends State<RideRequest>
             nearbyDriver.lng = map['longitude'];
             FireHelper.updateNearbyLocation(nearbyDriver);
             updateDriversOnmap();
+            print(
+                'FIREHLEPR Moved LENGHT: ${FireHelper.nearbyDriverlist.length}');
             break;
 
           case Geofire.onGeoQueryReady:
             // All Intial Data is loaded
             nearbyKeyisLoaded = true;
             updateDriversOnmap();
-            print('FIREHLEPR LENGHT: ${FireHelper.nearbyDriverlist.length}');
+            print(
+                'FIREHLEPR Query LENGHT: ${FireHelper.nearbyDriverlist.length}');
             break;
         }
       }
@@ -1084,8 +1103,12 @@ class _RideRequestState extends State<RideRequest>
       if (status == 'Accepted') {
         showTripsheet();
         bool response = await Geofire.stopListener();
-        print("Geofire Status >>>>>>>>>> $response");
+        print("Geofire Accepted Status >>>>>>>>>> $response");
         removeGeofireMarkers();
+        setState(() {
+          availableDrivers = [];
+          FireHelper.nearbyDriverlist = [];
+        });
       }
       if (status == 'Ended') {
         if (event.snapshot.value['fare'] != null) {
@@ -1211,6 +1234,10 @@ class _RideRequestState extends State<RideRequest>
 
   //If No Driver/s is found
   void noDriverFound() {
+    setState(() {
+      availableDrivers = [];
+      FireHelper.nearbyDriverlist = [];
+    });
     showDialog(
         context: context,
         barrierDismissible: false,

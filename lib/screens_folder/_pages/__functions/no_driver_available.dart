@@ -54,8 +54,6 @@ class NoDriverAvailable extends StatelessWidget {
                     color: Colors.grey[400],
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushNamed('/wrapper');
                     },
                   ),
                 ),
