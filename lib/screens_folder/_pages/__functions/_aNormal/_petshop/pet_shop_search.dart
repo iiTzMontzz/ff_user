@@ -1,5 +1,5 @@
-import 'package:ff_user/models_folder/veterinary.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_tile.dart';
+import 'package:ff_user/models_folder/pet_store.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/pet_shop_tile.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/services_folder/_helper/request_helper.dart';
@@ -10,20 +10,21 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
-class VetSearch extends StatefulWidget {
+class PetStoreSearch extends StatefulWidget {
   @override
-  _VetSearchState createState() => _VetSearchState();
+  _PetStoreSearchState createState() => _PetStoreSearchState();
 }
 
-class _VetSearchState extends State<VetSearch> {
+class _PetStoreSearchState extends State<PetStoreSearch> {
   var geolocator = Geolocator();
-  List<Veterinaries> listVets = [];
+  List<PetStore> listVets = [];
   var pickupController = TextEditingController();
   var destinationController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    nearestVet();
+    petShops();
   }
 
   @override
@@ -65,7 +66,7 @@ class _VetSearchState extends State<VetSearch> {
                       ),
                       Center(
                         child: Text(
-                          'Nearest Veterinary',
+                          'Nearest Pet Strore',
                           style: TextStyle(
                             fontFamily: 'Muli',
                             fontSize: getProportionateScreenHeight(22),
@@ -131,7 +132,7 @@ class _VetSearchState extends State<VetSearch> {
                     separatorBuilder: (BuildContext context, int index) =>
                         CustomDivider(),
                     itemBuilder: (context, index) {
-                      return VetTile(vet: listVets[index]);
+                      return PetShopTile(petStore: listVets[index]);
                     },
                   ),
                 )
@@ -144,14 +145,14 @@ class _VetSearchState extends State<VetSearch> {
     );
   }
 
-  void nearestVet() async {
+  void petShops() async {
     Position position = await geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
     String address =
         await HelperMethod.findCoordinateAddress(position, context);
-    print('VETERENIARYY _+___>>>>>>>>>>>>>>>' + address);
+    print('PET STORE------ _+___>>>>>>>>>>>>>>>' + address);
     String url =
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude},${position.longitude}&radius=2000&type=veterinary_care&key=$androidID';
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude},${position.longitude}&radius=2000&type=pet_store&key=$androidID';
 
     var response = await RequestHelper.getRequest(url);
     if (response == 'failed') {
@@ -160,7 +161,7 @@ class _VetSearchState extends State<VetSearch> {
     if (response['status'] == 'OK') {
       var jsonVetList = response['results'];
       var thisList =
-          (jsonVetList as List).map((e) => Veterinaries.fromJson(e)).toList();
+          (jsonVetList as List).map((e) => PetStore.fromJson(e)).toList();
       print(response);
       setState(() {
         listVets = thisList;

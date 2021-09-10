@@ -17,7 +17,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      body: Home(geostat: widget.geostat),
+      body: Home(),
       bottomNavigationBar: CustomBottomNavBar(selectedMenu: MenuState.home),
     );
   }

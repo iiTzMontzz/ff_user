@@ -1,34 +1,28 @@
-import 'package:ff_user/models_folder/pet_store.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_tile.dart';
+import 'package:ff_user/models_folder/predictions.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/user_tile.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
-import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/services_folder/_helper/request_helper.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_global/key.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
-class PetStoreSearch extends StatefulWidget {
+class UserSearch extends StatefulWidget {
   @override
-  _PetStoreSearchState createState() => _PetStoreSearchState();
+  _UserSearchState createState() => _UserSearchState();
 }
 
-class _PetStoreSearchState extends State<PetStoreSearch> {
-  var geolocator = Geolocator();
-  List<PetStore> listVets = [];
+class _UserSearchState extends State<UserSearch> {
   var pickupController = TextEditingController();
   var destinationController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    petShops();
-  }
-
+  var focusDestination = FocusNode();
+  List<Predictions> destinationList = [];
+  bool focus = false;
   @override
   Widget build(BuildContext context) {
+    setFocus();
     String address = (Provider.of<AppData>(context).pickupAddress != null)
         ? Provider.of<AppData>(context).pickupAddress.placename
         : 'Getting Current Location....';
@@ -38,7 +32,7 @@ class _PetStoreSearchState extends State<PetStoreSearch> {
       body: Column(
         children: [
           Container(
-            height: getProportionateScreenHeight(200),
+            height: getProportionateScreenHeight(240),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -66,7 +60,7 @@ class _PetStoreSearchState extends State<PetStoreSearch> {
                       ),
                       Center(
                         child: Text(
-                          'Nearest Pet Strore',
+                          'Set Trip',
                           style: TextStyle(
                             fontFamily: 'Muli',
                             fontSize: getProportionateScreenHeight(22),
@@ -84,7 +78,7 @@ class _PetStoreSearchState extends State<PetStoreSearch> {
                         height: getProportionateScreenHeight(16),
                         width: getProportionateScreenWidth(16),
                       ),
-                      SizedBox(width: 18),
+                      SizedBox(width: getProportionateScreenWidth(18)),
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
@@ -118,54 +112,104 @@ class _PetStoreSearchState extends State<PetStoreSearch> {
                       ),
                     ],
                   ),
+                  SizedBox(height: getProportionateScreenHeight(10)),
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/pin.png',
+                        height: getProportionateScreenHeight(16),
+                        width: getProportionateScreenWidth(16),
+                      ),
+                      SizedBox(width: getProportionateScreenWidth(18)),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(4)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: TextField(
+                              onChanged: (value) {
+                                searchPlace(value);
+                              },
+                              controller: destinationController,
+                              focusNode: focusDestination,
+                              decoration: InputDecoration(
+                                hintText: 'Destination',
+                                fillColor: Colors.grey[50],
+                                filled: true,
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.only(
+                                  left: 10,
+                                  top: 10,
+                                  bottom: 10,
+                                ),
+                              ),
+                              style: TextStyle(
+                                fontFamily: 'Muli',
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
-          (listVets.length > 0)
+          (destinationList.length > 0)
               ? Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: listVets.length,
+                    padding: EdgeInsets.all(0),
+                    itemCount: destinationList.length,
                     separatorBuilder: (BuildContext context, int index) =>
                         CustomDivider(),
                     itemBuilder: (context, index) {
-                      return PetShopTile(petStore: listVets[index]);
+                      return UserTile(predictions: destinationList[index]);
                     },
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
                   ),
                 )
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
-                ),
+              : Container(),
         ],
       ),
     );
   }
 
-  void petShops() async {
-    Position position = await geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
-    String address =
-        await HelperMethod.findCoordinateAddress(position, context);
-    print('PET STORE------ _+___>>>>>>>>>>>>>>>' + address);
-    String url =
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude},${position.longitude}&radius=2000&type=pet_store&key=$androidID';
-
-    var response = await RequestHelper.getRequest(url);
-    if (response == 'failed') {
-      return;
+  void setFocus() {
+    if (!focus) {
+      FocusScope.of(context).requestFocus(focusDestination);
+      focus = true;
     }
-    if (response['status'] == 'OK') {
-      var jsonVetList = response['results'];
-      var thisList =
-          (jsonVetList as List).map((e) => PetStore.fromJson(e)).toList();
-      print(response);
-      setState(() {
-        listVets = thisList;
-      });
+  }
+
+  void searchPlace(String placeName) async {
+    var uuid = Uuid();
+
+    if (placeName.length > 1) {
+      String url =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&location=7.1907,125.4553&radius=49436.8284&key=$androidID&sessiontoken=${uuid.v4()}&components=country:ph&regions=postal_code:8000';
+      var response = await RequestHelper.getRequest(url);
+      if (response == 'failed') {
+        return;
+      }
+      if (response['status'] == 'OK') {
+        var jsonpredictions = response['predictions'];
+        var thisList = (jsonpredictions as List)
+            .map((e) => Predictions.fromJson(e))
+            .toList();
+        print(response);
+        setState(() {
+          destinationList = thisList;
+        });
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:ff_user/screens_folder/_pages/__functions/ride_request.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/ride_request.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';

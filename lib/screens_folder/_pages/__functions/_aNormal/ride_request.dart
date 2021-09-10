@@ -3,11 +3,11 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:ff_user/models_folder/direction_details.dart';
 import 'package:ff_user/models_folder/nearby_drivers.dart';
 import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/home/homeSplash.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_petshop/pet_shop_search.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_user/user_search.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_vet/vet_search.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/no_driver_available.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/payments_dialog.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/pet_shop_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/user_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_widgets/no_driver_available.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_widgets/payments_dialog.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/fire_helper.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
@@ -1102,13 +1102,7 @@ class _RideRequestState extends State<RideRequest>
       //if Status is accepted
       if (status == 'Accepted') {
         showTripsheet();
-        bool response = await Geofire.stopListener();
-        print("Geofire Accepted Status >>>>>>>>>> $response");
         removeGeofireMarkers();
-        setState(() {
-          availableDrivers = [];
-          FireHelper.nearbyDriverlist = [];
-        });
       }
       if (status == 'Ended') {
         if (event.snapshot.value['fare'] != null) {
@@ -1227,17 +1221,13 @@ class _RideRequestState extends State<RideRequest>
       return;
     }
     var driver = availableDrivers[0];
-    notifyDriver(driver);
     availableDrivers.removeAt(0);
+    notifyDriver(driver);
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
   }
 
   //If No Driver/s is found
   void noDriverFound() {
-    setState(() {
-      availableDrivers = [];
-      FireHelper.nearbyDriverlist = [];
-    });
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -1270,6 +1260,10 @@ class _RideRequestState extends State<RideRequest>
           driverTripRef.onDisconnect();
           timer.cancel();
           driverRequestTimedOut = 10;
+          DatabaseReference historyRef = FirebaseDatabase.instance
+              .reference()
+              .child('users/${currentUserinfo.uid}/history/${tripRef.key}');
+          historyRef.set(true);
         }
         driverRequestTimedOut--;
         //If the Driver Accepts the Request
@@ -1278,6 +1272,10 @@ class _RideRequestState extends State<RideRequest>
             driverTripRef.onDisconnect();
             timer.cancel();
             driverRequestTimedOut = 10;
+            DatabaseReference historyRef = FirebaseDatabase.instance
+                .reference()
+                .child('users/${currentUserinfo.uid}/history/${tripRef.key}');
+            historyRef.set(true);
           }
         });
         if (driverRequestTimedOut == 0) {
@@ -1285,8 +1283,6 @@ class _RideRequestState extends State<RideRequest>
           driverTripRef.onDisconnect();
           driverRequestTimedOut = 10;
           timer.cancel();
-          bool response = await Geofire.stopListener();
-          print("NotifyDriver STOP LISTENER NOTIFY DRIVER >>> $response");
           //Find New Driver'
           findDriver();
         }

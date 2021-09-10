@@ -1,14 +1,42 @@
-import 'package:ff_user/screens_folder/_pages/__functions/_user/userSplash.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/userSplash.dart';
 import 'package:ff_user/shared_folder/_buttons/trans_button.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
-import 'package:ff_user/shared_folder/_constants/splash.dart';
+import 'package:ff_user/shared_folder/_global/glob_var.dart';
 import 'package:flutter/material.dart';
 
-class CarType extends StatelessWidget {
+class CarType extends StatefulWidget {
   final String rideType;
-  final bool geostat;
 
-  const CarType({this.rideType, this.geostat});
+  const CarType({this.rideType});
+
+  @override
+  _CarTypeState createState() => _CarTypeState();
+}
+
+class _CarTypeState extends State<CarType> {
+  bool geoS;
+  bool geoM;
+  bool geoL;
+  @override
+  void initState() {
+    super.initState();
+    if (geoSmall == null) {
+      geoS = true;
+    } else {
+      geoS = false;
+    }
+    if (geoMedium = null) {
+      geoM = true;
+    } else {
+      geoM = false;
+    }
+    if (geoLarge == null) {
+      geoL = true;
+    } else {
+      geoL = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -38,8 +66,8 @@ class CarType extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => UserSplash(
                           carType: 'aNormal',
-                          rideType: rideType,
-                          geostat: geostat,
+                          rideType: widget.rideType,
+                          geostat: geoS,
                         )));
               }, context, 'Fsmall.png'),
               SizedBox(
@@ -49,7 +77,11 @@ class CarType extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Splash(route: '/ridereqADelux')));
+                    builder: (context) => UserSplash(
+                          carType: 'aDelux',
+                          rideType: widget.rideType,
+                          geostat: geoM,
+                        )));
               }, context, 'Fmedium.png'),
               SizedBox(
                 height: getProportionateScreenHeight(5),
@@ -58,7 +90,11 @@ class CarType extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Splash(route: '/ridereqAVip')));
+                    builder: (context) => UserSplash(
+                          carType: 'aVIP',
+                          rideType: widget.rideType,
+                          geostat: geoL,
+                        )));
               }, context, 'FLarge.png'),
               SizedBox(
                 height: getProportionateScreenHeight(45),

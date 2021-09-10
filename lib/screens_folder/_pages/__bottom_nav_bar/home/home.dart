@@ -1,32 +1,15 @@
-import 'package:ff_user/screens_folder/_pages/__functions/car_type.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
-  final bool geostat;
-  const Home({this.geostat});
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  bool geostatus;
-  @override
-  void initState() {
-    super.initState();
-    if (widget.geostat == null) {
-      setState(() {
-        geostatus = true;
-      });
-    } else {
-      setState(() {
-        geostatus = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -98,7 +81,6 @@ class _HomeState extends State<Home> {
                                     barrierDismissible: false,
                                     builder: (BuildContext context) => CarType(
                                           rideType: 'Normal',
-                                          geostat: geostatus,
                                         ));
                               },
                             ),
