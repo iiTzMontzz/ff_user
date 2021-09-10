@@ -17,6 +17,7 @@ class _CarTypeState extends State<CarType> {
   bool geoS;
   bool geoM;
   bool geoL;
+
   @override
   void initState() {
     super.initState();
@@ -25,8 +26,8 @@ class _CarTypeState extends State<CarType> {
     } else {
       geoS = false;
     }
-    if (geoMedium = null) {
-      geoM = true;
+    if (geoMedium == null) {
+      geoMedium = true;
     } else {
       geoM = false;
     }

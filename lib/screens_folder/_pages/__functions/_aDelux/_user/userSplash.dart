@@ -1,17 +1,23 @@
 import 'dart:async';
-import 'package:ff_user/screens_folder/_fronts/_landing/landingPage.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aDelux/ride_request.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-class HomeSplash extends StatelessWidget {
+class UserSplash extends StatelessWidget {
   final bool geostat;
-  HomeSplash({this.geostat});
+  final String rideType;
+  final String carType;
+  UserSplash({this.geostat, this.rideType, this.carType});
   @override
   Widget build(BuildContext context) {
     Timer(Duration(milliseconds: 3500), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => (LandingPage(geostat: geostat))));
+          builder: (context) => (RideRequest(
+                carType: carType,
+                geostat: geostat,
+                rideType: rideType,
+              ))));
     });
 
     return Scaffold(

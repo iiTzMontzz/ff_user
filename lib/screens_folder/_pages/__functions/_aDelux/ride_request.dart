@@ -201,7 +201,7 @@ class _RideRequestState extends State<RideRequest>
                                     startGeofireListener();
                                     setState(() {
                                       startGeofire = false;
-                                      geoSmall = false;
+                                      geoMedium = false;
                                     });
                                   }
                                 }
@@ -258,7 +258,7 @@ class _RideRequestState extends State<RideRequest>
                                         startGeofireListener();
                                         setState(() {
                                           startGeofire = false;
-                                          geoSmall = false;
+                                          geoMedium = false;
                                         });
                                       }
                                     }
@@ -319,7 +319,7 @@ class _RideRequestState extends State<RideRequest>
                                         startGeofireListener();
                                         setState(() {
                                           startGeofire = false;
-                                          geoSmall = false;
+                                          geoMedium = false;
                                         });
                                       }
                                     }
