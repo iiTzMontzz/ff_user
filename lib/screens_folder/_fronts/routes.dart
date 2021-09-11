@@ -27,18 +27,7 @@ final Map<String, WidgetBuilder> routes = {
   '/driver': (BuildContext context) => Driver(),
   '/onreview': (BuildContext context) => OnReview(),
   '/userwrapper': (BuildContext context) => UserWrapper(),
-  '/ridereqANormal': (BuildContext context) => RideRequest(
-        rideType: 'Normal',
-        carType: 'aNormal',
-      ),
-  '/ridereqADelux': (BuildContext context) => RideRequest(
-        rideType: 'Normal',
-        carType: 'aDelux',
-      ),
-  '/ridereqAVip': (BuildContext context) => RideRequest(
-        rideType: 'Normal',
-        carType: 'aVIP',
-      ),
+  '/ridereq': (BuildContext context) => RideRequest(rideType: 'Normal'),
   '/ridereq_pet': (BuildContext context) => RideRequest(rideType: 'Pet Only'),
   '/petreciever': (BuildContext context) => PetReciever(),
 };

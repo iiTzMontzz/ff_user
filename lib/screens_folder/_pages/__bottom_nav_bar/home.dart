@@ -1,4 +1,3 @@
-import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
@@ -79,8 +78,8 @@ class _HomeState extends State<Home> {
                                 showDialog(
                                     context: context,
                                     barrierDismissible: false,
-                                    builder: (BuildContext context) => CarType(
-                                          rideType: 'Normal',
+                                    builder: (BuildContext context) => Splash(
+                                          route: '/ridereq',
                                         ));
                               },
                             ),

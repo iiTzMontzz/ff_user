@@ -5,6 +5,7 @@ import 'package:ff_user/models_folder/nearby_drivers.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/user_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/no_driver_available.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/payments_dialog.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
@@ -28,9 +29,7 @@ import 'package:provider/provider.dart';
 
 class RideRequest extends StatefulWidget {
   final String rideType;
-  final String carType;
-  final bool geostat;
-  const RideRequest({this.rideType, this.carType, this.geostat});
+  const RideRequest({this.rideType});
 
   @override
   _RideRequestState createState() => _RideRequestState();
@@ -67,11 +66,11 @@ class _RideRequestState extends State<RideRequest>
   void initState() {
     super.initState();
     HelperMethod.getcurrentUserInfo();
-    Geofire.initialize(widget.carType);
-    print('CAR TYPE >>>>>>>>>>>> ${widget.carType}');
-    setState(() {
-      startGeofire = widget.geostat;
-    });
+    if (geoStatus == null) {
+      startGeofire = true;
+    } else {
+      startGeofire = false;
+    }
   }
 
   @override
@@ -197,15 +196,6 @@ class _RideRequestState extends State<RideRequest>
                                             UserSearch()));
                                 if (response == 'getDirections') {
                                   showtripDetailsheet();
-                                  if (startGeofire == true) {
-                                    startGeofireListener();
-                                    setState(() {
-                                      startGeofire = false;
-                                      geoSmall = false;
-                                    });
-                                    print('GEOMEDIUM $geoMedium');
-                                    print('GEOLARGE $geoLarge');
-                                  }
                                 }
                               },
                               child: Container(
@@ -256,15 +246,6 @@ class _RideRequestState extends State<RideRequest>
                                                 VetSearch()));
                                     if (response == 'NearestVet') {
                                       showtripDetailsheet();
-                                      if (startGeofire == true) {
-                                        startGeofireListener();
-                                        setState(() {
-                                          startGeofire = false;
-                                          geoSmall = false;
-                                        });
-                                        print('GEOMEDIUM $geoMedium');
-                                        print('GEOLARGE $geoLarge');
-                                      }
                                     }
                                   },
                                   child: Container(
@@ -319,15 +300,6 @@ class _RideRequestState extends State<RideRequest>
                                                 PetStoreSearch()));
                                     if (response == 'PetStore') {
                                       showtripDetailsheet();
-                                      if (startGeofire == true) {
-                                        startGeofireListener();
-                                        setState(() {
-                                          startGeofire = false;
-                                          geoSmall = false;
-                                        });
-                                        print('GEOMEDIUM $geoMedium');
-                                        print('GEOLARGE $geoLarge');
-                                      }
                                     }
                                   },
                                   child: Container(
@@ -502,15 +474,63 @@ class _RideRequestState extends State<RideRequest>
                               child: MainButton(
                                 title: 'Proceed',
                                 color: Colors.blue[400],
-                                onpress: () {
-                                  setState(() {
-                                    appState = 'Requesting';
-                                  });
-                                  showLoadingTrip();
-                                  availableDrivers =
-                                      FireHelper.nearbyDriverlist;
-
-                                  findDriver();
+                                onpress: () async {
+                                  var response = await showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) =>
+                                          CarType());
+                                  if (response == 'Normal') {
+                                    print("RESPONSE >> Normal");
+                                    if (startGeofire == true) {
+                                      startGeofireListener();
+                                      setState(() {
+                                        startGeofire = false;
+                                        geoStatus = false;
+                                      });
+                                    }
+                                    setState(() {
+                                      appState = 'Requesting';
+                                    });
+                                    showLoadingTrip();
+                                    availableDrivers =
+                                        FireHelper.nearbyDriverlist;
+                                    findDriver();
+                                  } else if (response == 'Medium') {
+                                    print("RESPONSE >> Medium");
+                                    if (startGeofire == true) {
+                                      startGeofireListener();
+                                      setState(() {
+                                        startGeofire = false;
+                                        geoStatus = false;
+                                      });
+                                    }
+                                    setState(() {
+                                      appState = 'Requesting';
+                                    });
+                                    showLoadingTrip();
+                                    availableDrivers =
+                                        FireHelper.nearbyDriverlist;
+                                    findDriver();
+                                  } else if (response == 'Delux') {
+                                    print("RESPONSE >> Delux");
+                                    if (startGeofire == true) {
+                                      startGeofireListener();
+                                      setState(() {
+                                        startGeofire = false;
+                                        geoStatus = false;
+                                      });
+                                    }
+                                    setState(() {
+                                      appState = 'Requesting';
+                                    });
+                                    showLoadingTrip();
+                                    availableDrivers =
+                                        FireHelper.nearbyDriverlist;
+                                    findDriver();
+                                  } else {
+                                    resetapp();
+                                  }
                                 },
                               ),
                             )
@@ -864,8 +884,6 @@ class _RideRequestState extends State<RideRequest>
     setState(() {
       mapPadding = getProportionateScreenHeight(310);
     });
-
-    print('CAR TYPE >>>>>>>>>>>> ${widget.carType}');
     setupPositionLocator();
   }
 
@@ -1243,8 +1261,8 @@ class _RideRequestState extends State<RideRequest>
       return;
     }
     var driver = availableDrivers[0];
-    availableDrivers.removeAt(0);
     notifyDriver(driver);
+    availableDrivers.removeAt(0);
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
   }
 
