@@ -51,6 +51,7 @@ dependencies:
   http: ^0.12.2
   toast: ^0.1.5
   uuid: ^2.2.2
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:

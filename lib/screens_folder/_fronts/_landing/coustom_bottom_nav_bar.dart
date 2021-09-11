@@ -84,6 +84,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
+
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => Splash(route: '/profile')));
                 },
