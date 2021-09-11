@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:ff_user/models_folder/history.dart';
 import 'package:ff_user/models_folder/user_data.dart';
 import 'package:ff_user/shared_folder/_global/glob_var.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,11 +14,12 @@ import 'package:ff_user/services_folder/_helper/request_helper.dart';
 import 'package:ff_user/shared_folder/_global/key.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class HelperMethod {
   //Get user Information
-  static void getcurrentUserInfo() async {
+  static void getcurrentUserInfo(context) async {
     currentuser = await FirebaseAuth.instance.currentUser();
     String uid = currentuser.uid;
 
@@ -28,6 +30,7 @@ class HelperMethod {
         currentUserinfo = UserData.fromSnapshot(snapshot);
         print('HELOOO MY NAME ISSSSSS>>>>>>>>>>>>>>>>>>>' +
             currentUserinfo.fullname);
+        getHistory(context, currentUserinfo.uid);
       }
     });
   }
@@ -126,5 +129,51 @@ class HelperMethod {
     var response = await http.post('https://fcm.googleapis.com/fcm/send',
         headers: headerMap, body: jsonEncode(bodyMap));
     print(response.body);
+  }
+
+//get history info
+  static void getHistory(context, String id) {
+    DatabaseReference historyRef =
+        FirebaseDatabase.instance.reference().child('users/$id/history');
+    historyRef.once().then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        Map<dynamic, dynamic> values = snapshot.value;
+
+        List<String> tripHistoryKeys = [];
+        values.forEach((key, value) {
+          tripHistoryKeys.add(key);
+        });
+
+        // update trip keys to data provider
+        Provider.of<AppData>(context, listen: false)
+            .updateTripKeys(tripHistoryKeys);
+
+        getHistoryData(context);
+      }
+    });
+  }
+
+  static void getHistoryData(context) {
+    var keys = Provider.of<AppData>(context, listen: false).tripHistoryKeys;
+
+    for (String key in keys) {
+      DatabaseReference historyRef =
+          FirebaseDatabase.instance.reference().child('rideRequest/$key');
+      historyRef.once().then((DataSnapshot snapshot) {
+        if (snapshot.value != null) {
+          var history = History.fromSnapshot(snapshot);
+          Provider.of<AppData>(context, listen: false)
+              .updateTripHistory(history);
+        }
+      });
+    }
+  }
+
+  static String formatMyDate(String datestring) {
+    DateTime thisDate = DateTime.parse(datestring);
+    String formattedDate =
+        '${DateFormat.MMMd().format(thisDate)}, ${DateFormat.y().format(thisDate)}';
+
+    return formattedDate;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:ff_user/models_folder/enums.dart';
 import 'package:ff_user/screens_folder/_fronts/_landing/coustom_bottom_nav_bar.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/_history/history_page.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -36,7 +37,10 @@ class History extends StatelessWidget {
           ),
           FlatButton(
             padding: EdgeInsets.all(0),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => HistoryPage()));
+            },
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(

@@ -127,6 +127,7 @@ class _VetSearchState extends State<VetSearch> {
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListView.separated(
                     shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                     itemCount: listVets.length,
                     separatorBuilder: (BuildContext context, int index) =>
                         CustomDivider(),

@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 
 class History {
+  String key;
   String pickup;
   String destination;
   String fares;
@@ -9,6 +10,7 @@ class History {
   String paymentMethod;
 
   History({
+    this.key,
     this.pickup,
     this.destination,
     this.fares,
@@ -18,6 +20,7 @@ class History {
   });
 
   History.fromSnapshot(DataSnapshot snapshot) {
+    key = snapshot.key;
     pickup = snapshot.value['pickup_address'];
     destination = snapshot.value['destination_address'];
     fares = snapshot.value['fare'].toString();

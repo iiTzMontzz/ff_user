@@ -1,3 +1,4 @@
+import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
@@ -9,6 +10,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+    HelperMethod.getcurrentUserInfo(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);

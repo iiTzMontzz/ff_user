@@ -65,7 +65,7 @@ class _RideRequestState extends State<RideRequest>
   @override
   void initState() {
     super.initState();
-    HelperMethod.getcurrentUserInfo();
+    HelperMethod.getcurrentUserInfo(context);
     if (geoStatus == null) {
       startGeofire = true;
     } else {

@@ -3,7 +3,7 @@ import 'package:ff_user/authentication_folder/sign_up.dart';
 import 'package:ff_user/screens_folder/_fronts/_landing/landingPage.dart';
 import 'package:ff_user/screens_folder/_fronts/get_started.dart';
 import 'package:ff_user/screens_folder/_fronts/welcome.dart';
-import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/history.dart';
+import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/_history/history.dart';
 import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/profile.dart';
 import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/wallet.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/pet_reciever.dart';

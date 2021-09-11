@@ -53,6 +53,7 @@ class VetTile extends StatelessWidget {
                             fontSize: getProportionateScreenHeight(12),
                             color: Colors.grey[850]),
                       ),
+                      SizedBox(height: getProportionateScreenHeight(2)),
                     ],
                   ),
                 )
