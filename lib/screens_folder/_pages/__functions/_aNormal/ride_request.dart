@@ -60,6 +60,7 @@ class _RideRequestState extends State<RideRequest>
   bool nearbyKeyisLoaded = false;
   bool isRequestingLocationDetails = false;
   bool startGeofire;
+  bool showCancel = true;
   var geolocator = Geolocator();
 
   @override
@@ -715,50 +716,68 @@ class _RideRequestState extends State<RideRequest>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                //Call
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: getProportionateScreenHeight(50),
-                                      width: getProportionateScreenWidth(50),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(25)),
-                                        border: Border.all(
-                                          width: 1.0,
-                                          color: Colors.grey[400],
-                                        ),
+                                //Messege Driver
+                                (showCancel == true)
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {},
+                                            child: Container(
+                                              height:
+                                                  getProportionateScreenHeight(
+                                                      50),
+                                              width:
+                                                  getProportionateScreenWidth(
+                                                      50),
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(25)),
+                                                border: Border.all(
+                                                  width: 1.0,
+                                                  color: Colors.grey[400],
+                                                ),
+                                              ),
+                                              child: Icon(Icons.call),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              height:
+                                                  getProportionateScreenHeight(
+                                                      10)),
+                                          Text(
+                                            'Messege',
+                                            style: TextStyle(
+                                                fontFamily: 'Muli',
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                       ),
-                                      child: Icon(Icons.call),
-                                    ),
-                                    SizedBox(
-                                        height:
-                                            getProportionateScreenHeight(10)),
-                                    Text(
-                                      'Call',
-                                      style: TextStyle(
-                                          fontFamily: 'Muli',
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ],
-                                ),
                                 //Driver Info
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Container(
-                                      height: getProportionateScreenHeight(50),
-                                      width: getProportionateScreenWidth(50),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(25)),
-                                        border: Border.all(
-                                          width: 1.0,
-                                          color: Colors.grey[400],
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        height:
+                                            getProportionateScreenHeight(50),
+                                        width: getProportionateScreenWidth(50),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(25)),
+                                          border: Border.all(
+                                            width: 1.0,
+                                            color: Colors.grey[400],
+                                          ),
                                         ),
+                                        child: Icon(Icons.list),
                                       ),
-                                      child: Icon(Icons.list),
                                     ),
                                     SizedBox(
                                         height:
@@ -772,40 +791,52 @@ class _RideRequestState extends State<RideRequest>
                                   ],
                                 ),
                                 //Cancel
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        tripRef.child('status').set('Canceled');
-                                        resetapp();
-                                      },
-                                      child: Container(
-                                        height:
-                                            getProportionateScreenHeight(50),
-                                        width: getProportionateScreenWidth(50),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(25)),
-                                          border: Border.all(
-                                            width: 1.0,
-                                            color: Colors.grey[400],
+                                (showCancel == true)
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              tripRef
+                                                  .child('status')
+                                                  .set('Canceled');
+                                              resetapp();
+                                            },
+                                            child: Container(
+                                              height:
+                                                  getProportionateScreenHeight(
+                                                      50),
+                                              width:
+                                                  getProportionateScreenWidth(
+                                                      50),
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(25)),
+                                                border: Border.all(
+                                                  width: 1.0,
+                                                  color: Colors.grey[400],
+                                                ),
+                                              ),
+                                              child: Icon(OMIcons.clear),
+                                            ),
                                           ),
-                                        ),
-                                        child: Icon(OMIcons.clear),
+                                          SizedBox(
+                                              height:
+                                                  getProportionateScreenHeight(
+                                                      10)),
+                                          Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                                fontFamily: 'Muli',
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                       ),
-                                    ),
-                                    SizedBox(
-                                        height:
-                                            getProportionateScreenHeight(10)),
-                                    Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                          fontFamily: 'Muli',
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                  ],
-                                ),
                               ],
                             ),
                           ],
@@ -1130,6 +1161,7 @@ class _RideRequestState extends State<RideRequest>
         } else if (status == 'Arrived') {
           setState(() {
             tripStatusDisplay = 'Driver has arrived';
+            showCancel = false;
           });
         } else if (status == 'OnTrip') {
           updateToDestination(driverLocation);
@@ -1158,6 +1190,9 @@ class _RideRequestState extends State<RideRequest>
             tripSubscription.cancel();
             tripSubscription = null;
             resetapp();
+            setState(() {
+              showCancel = true;
+            });
           }
         }
       }
@@ -1220,9 +1255,7 @@ class _RideRequestState extends State<RideRequest>
 
   //updating drivers on map
   void updateDriversOnmap() {
-    setState(() {
-      _markers.clear();
-    });
+    _markers.clear();
     Set<Marker> tempoMarker = Set<Marker>();
     for (NearbyDriver driver in FireHelper.nearbyDriverlist) {
       LatLng driverPos = LatLng(driver.lat, driver.lng);
@@ -1245,7 +1278,7 @@ class _RideRequestState extends State<RideRequest>
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context, size: Size(2, 2));
       BitmapDescriptor.fromAssetImage(
-              imageConfiguration, 'assets/images/pawprint.png')
+              imageConfiguration, 'assets/images/paw-print.png')
           .then((icon) {
         nearbyDriverIcon = icon;
       });
