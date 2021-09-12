@@ -1,11 +1,10 @@
 import 'package:ff_user/authentication_folder/login.dart';
 import 'package:ff_user/authentication_folder/sign_up.dart';
-import 'package:ff_user/screens_folder/_fronts/_landing/landingPage.dart';
 import 'package:ff_user/screens_folder/_fronts/get_started.dart';
 import 'package:ff_user/screens_folder/_fronts/welcome.dart';
-import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/_history/history.dart';
-import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/profile.dart';
-import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/wallet.dart';
+import 'package:ff_user/screens_folder/_pages/_history/history.dart';
+import 'package:ff_user/screens_folder/_pages/profile.dart';
+import 'package:ff_user/screens_folder/_pages/wallet.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/pet_reciever.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/ride_request.dart';
 import 'package:ff_user/wrapper_folder/driver.dart';
@@ -22,7 +21,6 @@ final Map<String, WidgetBuilder> routes = {
   '/profile': (BuildContext context) => Profile(),
   '/wallet': (BuildContext context) => Wallet(),
   '/history': (BuildContext context) => History(),
-  '/landingpage': (BuildContext context) => LandingPage(),
   '/wrapper': (BuildContext context) => Wrapper(),
   '/driver': (BuildContext context) => Driver(),
   '/onreview': (BuildContext context) => OnReview(),

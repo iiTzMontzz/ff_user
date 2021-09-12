@@ -1,5 +1,3 @@
-import 'package:ff_user/models_folder/enums.dart';
-import 'package:ff_user/screens_folder/_fronts/_landing/coustom_bottom_nav_bar.dart';
 import 'package:ff_user/services_folder/_database/auth.dart';
 import 'package:ff_user/shared_folder/_constants/splash.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +30,6 @@ class _ProfileState extends State<Profile> {
           ),
         ),
       )),
-      bottomNavigationBar: CustomBottomNavBar(selectedMenu: MenuState.profile),
     );
   }
 }

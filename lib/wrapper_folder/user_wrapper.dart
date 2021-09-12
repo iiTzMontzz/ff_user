@@ -1,7 +1,7 @@
 import 'package:ff_user/authentication_folder/sign_up.dart';
 import 'package:ff_user/models_folder/person.dart';
 import 'package:ff_user/models_folder/user.dart';
-import 'package:ff_user/screens_folder/_fronts/_landing/landingPage.dart';
+import 'package:ff_user/screens_folder/_fronts/home.dart';
 import 'package:ff_user/wrapper_folder/driver.dart';
 import 'package:ff_user/wrapper_folder/onReview.dart';
 import 'package:ff_user/services_folder/_database/data.dart';
@@ -23,7 +23,7 @@ class _UserWrapperState extends State<UserWrapper> {
         if (snapshot.hasData) {
           if (snapshot.data.type == 'Passenger') {
             if (snapshot.data.availability == 'Enabled') {
-              return LandingPage();
+              return Home();
             } else {
               return OnReview();
             }

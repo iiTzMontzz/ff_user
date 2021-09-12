@@ -1,4 +1,4 @@
-import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/_history/history_tile.dart';
+import 'package:ff_user/screens_folder/_pages/_history/history_tile.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:flutter/material.dart';

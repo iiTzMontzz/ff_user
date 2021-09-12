@@ -1,5 +1,3 @@
-import 'package:ff_user/models_folder/enums.dart';
-import 'package:ff_user/screens_folder/_fronts/_landing/coustom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class Wallet extends StatelessWidget {
@@ -10,7 +8,6 @@ class Wallet extends StatelessWidget {
       body: SafeArea(
         child: Container(),
       ),
-      bottomNavigationBar: CustomBottomNavBar(selectedMenu: MenuState.wallet),
     );
   }
 }

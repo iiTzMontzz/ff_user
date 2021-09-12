@@ -1,6 +1,5 @@
-import 'package:ff_user/models_folder/enums.dart';
-import 'package:ff_user/screens_folder/_fronts/_landing/coustom_bottom_nav_bar.dart';
-import 'package:ff_user/screens_folder/_pages/__bottom_nav_bar/_history/history_page.dart';
+import 'package:ff_user/screens_folder/_fronts/home.dart';
+import 'package:ff_user/screens_folder/_pages/_history/history_page.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
@@ -12,6 +11,14 @@ class History extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[300],
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => Home()));
+          },
+          icon: Icon(Icons.keyboard_arrow_left),
+        ),
       ),
       body: Column(
         children: [
@@ -69,7 +76,6 @@ class History extends StatelessWidget {
           CustomDivider(),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavBar(selectedMenu: MenuState.history),
     );
   }
 }
