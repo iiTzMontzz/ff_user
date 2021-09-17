@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:ff_user/messeging/chatroom_list.dart';
 import 'package:ff_user/models_folder/direction_details.dart';
 import 'package:ff_user/models_folder/nearby_drivers.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/pet_shop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/user_search.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/search_vet.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/no_driver_available.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/payments_dialog.dart';
@@ -244,7 +245,7 @@ class _RideRequestState extends State<RideRequest>
                                     var response = await Navigator.of(context)
                                         .push(MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                VetSearch()));
+                                                Searchvet()));
                                     if (response == 'NearestVet') {
                                       showtripDetailsheet();
                                     }
@@ -723,7 +724,17 @@ class _RideRequestState extends State<RideRequest>
                                             CrossAxisAlignment.center,
                                         children: [
                                           GestureDetector(
-                                            onTap: () {},
+                                            onTap: () {
+                                              showDialog(
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          ChatRoomList(
+                                                              tripID:
+                                                                  tripRef.key));
+                                              print("TRIP ID: " + tripRef.key);
+                                            },
                                             child: Container(
                                               height:
                                                   getProportionateScreenHeight(
@@ -1161,9 +1172,9 @@ class _RideRequestState extends State<RideRequest>
         } else if (status == 'Arrived') {
           setState(() {
             tripStatusDisplay = 'Driver has arrived';
-            showCancel = false;
           });
         } else if (status == 'OnTrip') {
+          showCancel = false;
           updateToDestination(driverLocation);
         }
       }
