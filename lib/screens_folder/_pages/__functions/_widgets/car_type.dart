@@ -1,7 +1,7 @@
 import 'package:ff_user/shared_folder/_buttons/trans_button.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
+import 'package:ff_user/shared_folder/_global/glob_var.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_geofire/flutter_geofire.dart';
 
 class CarType extends StatefulWidget {
   @override
@@ -32,32 +32,29 @@ class _CarTypeState extends State<CarType> {
                   ),
                 ),
               ),
-              cars(() async {
-                bool response = await Geofire.initialize('aNormal');
-                if (response == true) {
-                  print('GEOFIRE >>> aNormal is $response');
-                  Navigator.of(context).pop('Normal');
-                }
+              cars(() {
+                setState(() {
+                  geoin = 'Normal';
+                });
+                Navigator.of(context).pop('Start');
               }, context, 'Fsmall.png'),
               SizedBox(
                 height: getProportionateScreenHeight(5),
               ),
-              cars(() async {
-                bool response = await Geofire.initialize('aDelux');
-                if (response == true) {
-                  print('GEOFIRE >>> aDelux is $response');
-                  Navigator.of(context).pop('Medium');
-                }
+              cars(() {
+                setState(() {
+                  geoin = 'Delux';
+                });
+                Navigator.of(context).pop('Start');
               }, context, 'Fmedium.png'),
               SizedBox(
                 height: getProportionateScreenHeight(5),
               ),
-              cars(() async {
-                bool response = await Geofire.initialize('aVIP');
-                if (response == true) {
-                  print('GEOFIRE >>> aVIP is $response');
-                  Navigator.of(context).pop('Delux');
-                }
+              cars(() {
+                setState(() {
+                  geoin = 'VIP';
+                });
+                Navigator.of(context).pop('Start');
               }, context, 'FLarge.png'),
               SizedBox(
                 height: getProportionateScreenHeight(45),

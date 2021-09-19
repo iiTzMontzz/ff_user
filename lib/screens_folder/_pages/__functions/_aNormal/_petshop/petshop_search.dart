@@ -1,5 +1,5 @@
-import 'package:ff_user/models_folder/veterinary.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_tile.dart';
+import 'package:ff_user/models_folder/pet_store.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/pet_shop_tile.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/services_folder/_helper/request_helper.dart';
@@ -9,20 +9,21 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
-class Searchvet extends StatefulWidget {
+class PetSearch extends StatefulWidget {
   @override
-  _SearchvetState createState() => _SearchvetState();
+  _PetSearchState createState() => _PetSearchState();
 }
 
-class _SearchvetState extends State<Searchvet> {
+class _PetSearchState extends State<PetSearch> {
   var geolocator = Geolocator();
-  List<Veterinaries> listVets = [];
+  List<PetStore> listPets = [];
   var pickupController = TextEditingController();
   var destinationController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    nearestVet();
+    petShops();
   }
 
   @override
@@ -40,7 +41,7 @@ class _SearchvetState extends State<Searchvet> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          "Nearest Veterinary",
+          "Nearest Pet Store",
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -99,13 +100,13 @@ class _SearchvetState extends State<Searchvet> {
               ],
             ),
           ),
-          vetDisplay(context),
+          petDisplay(context),
         ],
       ),
     );
   }
 
-  Widget vetDisplay(context) {
+  Widget petDisplay(context) {
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.only(top: 10),
@@ -113,18 +114,18 @@ class _SearchvetState extends State<Searchvet> {
         height: MediaQuery.of(context).size.height / 1.4,
         child: Stack(
           children: <Widget>[
-            (listVets.length > 0)
+            (listPets.length > 0)
                 ? Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     child: ListView.separated(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: listVets.length,
+                      itemCount: listPets.length,
                       separatorBuilder: (BuildContext context, int index) =>
                           CustomDivider(),
                       itemBuilder: (context, index) {
-                        return VetTile(vet: listVets[index]);
+                        return PetShopTile(petStore: listPets[index]);
                       },
                     ),
                   )
@@ -146,14 +147,14 @@ class _SearchvetState extends State<Searchvet> {
     );
   }
 
-  void nearestVet() async {
+  void petShops() async {
     Position position = await geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
     String address =
         await HelperMethod.findCoordinateAddress(position, context);
-    print('VETERENIARYY _+___>>>>>>>>>>>>>>>' + address);
+    print('PET STORE------ _+___>>>>>>>>>>>>>>>' + address);
     String url =
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude},${position.longitude}&radius=2000&type=veterinary_care&key=$androidID';
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.latitude},${position.longitude}&radius=2000&type=pet_store&key=$androidID';
 
     var response = await RequestHelper.getRequest(url);
     if (response == 'failed') {
@@ -162,10 +163,10 @@ class _SearchvetState extends State<Searchvet> {
     if (response['status'] == 'OK') {
       var jsonVetList = response['results'];
       var thisList =
-          (jsonVetList as List).map((e) => Veterinaries.fromJson(e)).toList();
+          (jsonVetList as List).map((e) => PetStore.fromJson(e)).toList();
       print(response);
       setState(() {
-        listVets = thisList;
+        listPets = thisList;
       });
     }
   }

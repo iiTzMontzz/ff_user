@@ -4,18 +4,17 @@ import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/services_folder/_helper/request_helper.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
-import 'package:ff_user/shared_folder/_constants/size_config.dart';
 import 'package:ff_user/shared_folder/_global/key.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
-class VetSearch extends StatefulWidget {
+class Searchvet extends StatefulWidget {
   @override
-  _VetSearchState createState() => _VetSearchState();
+  _SearchvetState createState() => _SearchvetState();
 }
 
-class _VetSearchState extends State<VetSearch> {
+class _SearchvetState extends State<Searchvet> {
   var geolocator = Geolocator();
   List<Veterinaries> listVets = [];
   var pickupController = TextEditingController();
@@ -33,115 +32,117 @@ class _VetSearchState extends State<VetSearch> {
         : 'Getting Current Location....';
     pickupController.text = address;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFFFFFF),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          "Nearest Veterinary",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: getProportionateScreenHeight(200),
+            height: MediaQuery.of(context).size.height / 7,
+            width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
+              boxShadow: [boxShadow()],
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 5.0,
-                  spreadRadius: 0.5,
-                  offset: Offset(0.7, 0.7),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(left: 25),
+                  child: Icon(
+                    Icons.location_on_outlined,
+                    color: Colors.black,
+                    size: 35,
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: TextField(
+                        controller: pickupController,
+                        decoration: InputDecoration(
+                          enabled: false,
+                          hintText: 'Pick up',
+                          fillColor: Colors.grey[50],
+                          filled: true,
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.only(
+                            left: 10,
+                            top: 10,
+                            bottom: 10,
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontFamily: 'Muli',
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 24, top: 48, right: 24, bottom: 20),
-              child: Column(
-                children: [
-                  SizedBox(height: getProportionateScreenHeight(5)),
-                  Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Icon(Icons.arrow_back),
-                      ),
-                      Center(
-                        child: Text(
-                          'Nearest Veterinary',
-                          style: TextStyle(
-                            fontFamily: 'Muli',
-                            fontSize: getProportionateScreenHeight(22),
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: getProportionateScreenHeight(20)),
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/images/rec.png',
-                        height: getProportionateScreenHeight(16),
-                        width: getProportionateScreenWidth(16),
-                      ),
-                      SizedBox(width: 18),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(4)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: TextField(
-                              controller: pickupController,
-                              decoration: InputDecoration(
-                                enabled: false,
-                                hintText: 'Pick up',
-                                fillColor: Colors.grey[50],
-                                filled: true,
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.only(
-                                  left: 10,
-                                  top: 10,
-                                  bottom: 10,
-                                ),
-                              ),
-                              style: TextStyle(
-                                fontFamily: 'Muli',
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ),
-          (listVets.length > 0)
-              ? Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: listVets.length,
-                    separatorBuilder: (BuildContext context, int index) =>
-                        CustomDivider(),
-                    itemBuilder: (context, index) {
-                      return VetTile(vet: listVets[index]);
-                    },
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(),
-                ),
+          vetDisplay(context),
         ],
       ),
+    );
+  }
+
+  Widget vetDisplay(context) {
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.only(top: 10),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height / 1.4,
+        child: Stack(
+          children: <Widget>[
+            (listVets.length > 0)
+                ? Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: listVets.length,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          CustomDivider(),
+                      itemBuilder: (context, index) {
+                        return VetTile(vet: listVets[index]);
+                      },
+                    ),
+                  )
+                : Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  boxShadow() {
+    return BoxShadow(
+      color: Colors.black45,
+      blurRadius: 3.0,
+      spreadRadius: 0.5,
+      offset: Offset(2.0, 2.0),
     );
   }
 

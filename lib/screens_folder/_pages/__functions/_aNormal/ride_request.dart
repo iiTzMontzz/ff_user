@@ -3,9 +3,9 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:ff_user/messeging/chatroom_list.dart';
 import 'package:ff_user/models_folder/direction_details.dart';
 import 'package:ff_user/models_folder/nearby_drivers.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/pet_shop_search.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_petshop/petshop_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_user/user_search.dart';
-import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/search_vet.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_search.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/no_driver_available.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/payments_dialog.dart';
@@ -30,7 +30,8 @@ import 'package:provider/provider.dart';
 
 class RideRequest extends StatefulWidget {
   final String rideType;
-  const RideRequest({this.rideType});
+  final String geoString;
+  const RideRequest({this.rideType, this.geoString});
 
   @override
   _RideRequestState createState() => _RideRequestState();
@@ -58,21 +59,17 @@ class _RideRequestState extends State<RideRequest>
   double tripSheet = 0;
   bool showTopnavi = true;
   bool isRequest = true;
-  bool nearbyKeyisLoaded = false;
   bool isRequestingLocationDetails = false;
-  bool startGeofire;
   bool showCancel = true;
+  bool nearbyKeyisLoaded = false;
+  int counter = 0;
   var geolocator = Geolocator();
 
   @override
   void initState() {
     super.initState();
     HelperMethod.getcurrentUserInfo(context);
-    if (geoStatus == null) {
-      startGeofire = true;
-    } else {
-      startGeofire = false;
-    }
+    Geofire.initialize('Drivers');
   }
 
   @override
@@ -198,6 +195,12 @@ class _RideRequestState extends State<RideRequest>
                                             UserSearch()));
                                 if (response == 'getDirections') {
                                   showtripDetailsheet();
+                                  if (geoStatus == null) {
+                                    startGeofireListener();
+                                    setState(() {
+                                      geoStatus = true;
+                                    });
+                                  }
                                 }
                               },
                               child: Container(
@@ -248,6 +251,12 @@ class _RideRequestState extends State<RideRequest>
                                                 Searchvet()));
                                     if (response == 'NearestVet') {
                                       showtripDetailsheet();
+                                      if (geoStatus == null) {
+                                        startGeofireListener();
+                                        setState(() {
+                                          geoStatus = true;
+                                        });
+                                      }
                                     }
                                   },
                                   child: Container(
@@ -299,9 +308,15 @@ class _RideRequestState extends State<RideRequest>
                                     var response = await Navigator.of(context)
                                         .push(MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                PetStoreSearch()));
+                                                PetSearch()));
                                     if (response == 'PetStore') {
                                       showtripDetailsheet();
+                                      if (geoStatus == null) {
+                                        startGeofireListener();
+                                        setState(() {
+                                          geoStatus = true;
+                                        });
+                                      }
                                     }
                                   },
                                   child: Container(
@@ -482,15 +497,7 @@ class _RideRequestState extends State<RideRequest>
                                       barrierDismissible: false,
                                       builder: (BuildContext context) =>
                                           CarType());
-                                  if (response == 'Normal') {
-                                    print("RESPONSE >> Normal");
-                                    if (startGeofire == true) {
-                                      startGeofireListener();
-                                      setState(() {
-                                        startGeofire = false;
-                                        geoStatus = false;
-                                      });
-                                    }
+                                  if (response == 'Start') {
                                     setState(() {
                                       appState = 'Requesting';
                                     });
@@ -498,40 +505,6 @@ class _RideRequestState extends State<RideRequest>
                                     availableDrivers =
                                         FireHelper.nearbyDriverlist;
                                     findDriver();
-                                  } else if (response == 'Medium') {
-                                    print("RESPONSE >> Medium");
-                                    if (startGeofire == true) {
-                                      startGeofireListener();
-                                      setState(() {
-                                        startGeofire = false;
-                                        geoStatus = false;
-                                      });
-                                    }
-                                    setState(() {
-                                      appState = 'Requesting';
-                                    });
-                                    showLoadingTrip();
-                                    availableDrivers =
-                                        FireHelper.nearbyDriverlist;
-                                    findDriver();
-                                  } else if (response == 'Delux') {
-                                    print("RESPONSE >> Delux");
-                                    if (startGeofire == true) {
-                                      startGeofireListener();
-                                      setState(() {
-                                        startGeofire = false;
-                                        geoStatus = false;
-                                      });
-                                    }
-                                    setState(() {
-                                      appState = 'Requesting';
-                                    });
-                                    showLoadingTrip();
-                                    availableDrivers =
-                                        FireHelper.nearbyDriverlist;
-                                    findDriver();
-                                  } else {
-                                    resetapp();
                                   }
                                 },
                               ),
@@ -909,7 +882,7 @@ class _RideRequestState extends State<RideRequest>
       isRequest = true;
       showTopnavi = true;
       tripSheet = 0;
-
+      counter = 0;
       status = '';
       driverName = '';
       driverPhone = '';
@@ -1052,7 +1025,7 @@ class _RideRequestState extends State<RideRequest>
 //Getting Nearby Drivers using Geofire
   void startGeofireListener() {
     Geofire.queryAtLocation(
-            currentPosition.latitude, currentPosition.longitude, 5)
+            currentPosition.latitude, currentPosition.longitude, 3)
         .listen((map) {
       if (map != null) {
         var callBack = map['callBack'];
@@ -1074,8 +1047,11 @@ class _RideRequestState extends State<RideRequest>
           case Geofire.onKeyExited:
             FireHelper.removeFromlist(map['key']);
             updateDriversOnmap();
+            if (counter != 0) {
+              counter--;
+            }
             print(
-                'FIREHLEPR Exited LENGHT: ${FireHelper.nearbyDriverlist.length}');
+                'FIREHLEPR Exited LENGHT: ${FireHelper.nearbyDriverlist.length} and counter $counter');
             break;
 
           case Geofire.onKeyMoved:
@@ -1266,7 +1242,9 @@ class _RideRequestState extends State<RideRequest>
 
   //updating drivers on map
   void updateDriversOnmap() {
-    _markers.clear();
+    setState(() {
+      _markers.clear();
+    });
     Set<Marker> tempoMarker = Set<Marker>();
     for (NearbyDriver driver in FireHelper.nearbyDriverlist) {
       LatLng driverPos = LatLng(driver.lat, driver.lng);
@@ -1303,10 +1281,19 @@ class _RideRequestState extends State<RideRequest>
       resetapp();
       noDriverFound();
       return;
+    } else if (availableDrivers.length < counter + 1) {
+      cancelRequest();
+      resetapp();
+      noDriverFound();
+      return;
     }
-    var driver = availableDrivers[0];
+    print(
+        'Current Counter .... $counter and available drivers ${availableDrivers.length}');
+    var driver = availableDrivers[counter];
     notifyDriver(driver);
-    availableDrivers.removeAt(0);
+    counter++;
+    print(
+        'Update Counter .... $counter and available drivers ${availableDrivers.length}');
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
   }
 
@@ -1320,49 +1307,73 @@ class _RideRequestState extends State<RideRequest>
 
 //Notifying Driver
   void notifyDriver(NearbyDriver nearbyDriver) {
-    DatabaseReference driverTripRef = FirebaseDatabase.instance
+    DatabaseReference driverType = FirebaseDatabase.instance
         .reference()
-        .child('drivers/${nearbyDriver.key}/newTrip');
-    driverTripRef.set(tripRef.key);
-    //Getting Driver Token
-    DatabaseReference driverTokenref = FirebaseDatabase.instance
-        .reference()
-        .child('drivers/${nearbyDriver.key}/token');
-    driverTokenref.once().then((DataSnapshot snapshot) {
+        .child('drivers/${nearbyDriver.key}/carType');
+    driverType.once().then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
-        String driverToken = snapshot.value.toString();
-        //Sending Notification to the selected Driver
-        HelperMethod.sendFcm(driverToken, context, tripRef.key);
-      } else {
-        return;
-      }
-      const oneSeckTick = Duration(seconds: 1);
-      Timer.periodic(oneSeckTick, (timer) async {
-        //Stopping the timer when the Passenger cancelled the trip request
-        if (appState != 'Requesting') {
-          driverTripRef.set('Canceled');
-          driverTripRef.onDisconnect();
-          timer.cancel();
-          driverRequestTimedOut = 10;
-        }
-        driverRequestTimedOut--;
-        //If the Driver Accepts the Request
-        driverTripRef.onValue.listen((event) {
-          if (event.snapshot.value.toString() == 'Accepted') {
-            driverTripRef.onDisconnect();
-            timer.cancel();
-            driverRequestTimedOut = 10;
-          }
-        });
-        if (driverRequestTimedOut == 0) {
-          driverTripRef.set('timeout');
-          driverTripRef.onDisconnect();
-          driverRequestTimedOut = 10;
-          timer.cancel();
-          //Find New Driver'
+        String type = snapshot.value.toString();
+        if (geoin == type) {
+          DatabaseReference driverTripRef = FirebaseDatabase.instance
+              .reference()
+              .child('drivers/${nearbyDriver.key}/newTrip');
+          driverTripRef.set(tripRef.key);
+          //Getting Driver Token
+          DatabaseReference driverTokenref = FirebaseDatabase.instance
+              .reference()
+              .child('drivers/${nearbyDriver.key}/token');
+          driverTokenref.once().then((DataSnapshot snapshot) {
+            if (snapshot.value != null) {
+              String driverToken = snapshot.value.toString();
+              //Sending Notification to the selected Driver
+              HelperMethod.sendFcm(driverToken, context, tripRef.key);
+            } else {
+              return;
+            }
+            const oneSeckTick = Duration(seconds: 1);
+            Timer.periodic(oneSeckTick, (timer) async {
+              //Stopping the timer when the Passenger cancelled the trip request
+              if (appState != 'Requesting') {
+                driverTripRef.set('Canceled');
+                driverTripRef.onDisconnect();
+                timer.cancel();
+                driverRequestTimedOut = 10;
+              }
+              driverRequestTimedOut--;
+              //If the Driver Accepts the Request
+              driverTripRef.onValue.listen((event) {
+                if (event.snapshot.value.toString() == 'Accepted') {
+                  driverTripRef.onDisconnect();
+                  timer.cancel();
+                  counter = 0;
+                  int index = availableDrivers
+                      .indexWhere((element) => element.key == nearbyDriver.key);
+                  availableDrivers.remove(index);
+                  print(
+                      'Current Counter .... $counter and available drivers ${availableDrivers.length}');
+                  driverRequestTimedOut = 10;
+                }
+              });
+              if (driverRequestTimedOut == 0) {
+                print('Current Counter .... $counter');
+                driverTripRef.set('timeout');
+                driverTripRef.onDisconnect();
+                driverRequestTimedOut = 10;
+                timer.cancel();
+                int index = availableDrivers
+                    .indexWhere((element) => element.key == nearbyDriver.key);
+                availableDrivers.remove(index);
+                print(
+                    "Drive timed out Removed >>>>> $index and available drivers ${availableDrivers.length}");
+                //Find New Driver'
+                findDriver();
+              }
+            });
+          });
+        } else {
           findDriver();
         }
-      });
+      }
     });
   }
 }
