@@ -1046,10 +1046,10 @@ class _RideRequestState extends State<RideRequest>
 
           case Geofire.onKeyExited:
             FireHelper.removeFromlist(map['key']);
-            updateDriversOnmap();
-            if (counter != 0) {
+            if (counter > 0) {
               counter--;
             }
+            updateDriversOnmap();
             print(
                 'FIREHLEPR Exited LENGHT: ${FireHelper.nearbyDriverlist.length} and counter $counter');
             break;
@@ -1291,7 +1291,6 @@ class _RideRequestState extends State<RideRequest>
         'Current Counter .... $counter and available drivers ${availableDrivers.length}');
     var driver = availableDrivers[counter];
     notifyDriver(driver);
-    counter++;
     print(
         'Update Counter .... $counter and available drivers ${availableDrivers.length}');
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
@@ -1313,6 +1312,7 @@ class _RideRequestState extends State<RideRequest>
     driverType.once().then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
         String type = snapshot.value.toString();
+        //check for car type
         if (geoin == type) {
           DatabaseReference driverTripRef = FirebaseDatabase.instance
               .reference()
@@ -1346,9 +1346,6 @@ class _RideRequestState extends State<RideRequest>
                   driverTripRef.onDisconnect();
                   timer.cancel();
                   counter = 0;
-                  int index = availableDrivers
-                      .indexWhere((element) => element.key == nearbyDriver.key);
-                  availableDrivers.remove(index);
                   print(
                       'Current Counter .... $counter and available drivers ${availableDrivers.length}');
                   driverRequestTimedOut = 10;
@@ -1360,17 +1357,18 @@ class _RideRequestState extends State<RideRequest>
                 driverTripRef.onDisconnect();
                 driverRequestTimedOut = 10;
                 timer.cancel();
-                int index = availableDrivers
-                    .indexWhere((element) => element.key == nearbyDriver.key);
-                availableDrivers.remove(index);
-                print(
-                    "Drive timed out Removed >>>>> $index and available drivers ${availableDrivers.length}");
+                // int index = availableDrivers
+                //     .indexWhere((element) => element.key == nearbyDriver.key);
+                // availableDrivers.remove(index);
+                // print(
+                //     "Drive timed out Removed >>>>> $index and available drivers ${availableDrivers.length}");
                 //Find New Driver'
                 findDriver();
               }
             });
           });
         } else {
+          counter++;
           findDriver();
         }
       }
