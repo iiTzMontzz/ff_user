@@ -9,6 +9,7 @@ import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/_vet/vet_sear
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/no_driver_available.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/payments_dialog.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_widgets/ratings.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/fire_helper.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
@@ -1112,6 +1113,7 @@ class _RideRequestState extends State<RideRequest>
       if (event.snapshot.value == null) {
         return;
       }
+
       //get Details
       if (event.snapshot.value['vehicle_detail'] != null) {
         setState(() {
@@ -1136,6 +1138,7 @@ class _RideRequestState extends State<RideRequest>
           status = event.snapshot.value['status'].toString();
         });
       }
+
       //Get and use Driver Location
       if (event.snapshot.value['driver_location'] != null) {
         double driverLat = double.parse(
@@ -1172,14 +1175,21 @@ class _RideRequestState extends State<RideRequest>
               builder: (BuildContext context) => PaymentsDialog(fare: fare));
 
           if (resposne == 'close') {
-            tripRef.onDisconnect();
-            tripRef = null;
-            tripSubscription.cancel();
-            tripSubscription = null;
-            resetapp();
-            setState(() {
-              showCancel = true;
-            });
+            var respo = await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) =>
+                    DriverRating(driverid: driverID));
+            if (respo == 'closed') {
+              tripRef.onDisconnect();
+              tripRef = null;
+              tripSubscription.cancel();
+              tripSubscription = null;
+              resetapp();
+              setState(() {
+                showCancel = true;
+              });
+            }
           }
         }
       }
@@ -1346,6 +1356,8 @@ class _RideRequestState extends State<RideRequest>
                   driverTripRef.onDisconnect();
                   timer.cancel();
                   counter = 0;
+                  driverID = nearbyDriver.key;
+                  print('Current Driver ID >>> $driverID');
                   print(
                       'Current Counter .... $counter and available drivers ${availableDrivers.length}');
                   driverRequestTimedOut = 10;

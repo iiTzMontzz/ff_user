@@ -5,3 +5,4 @@ String carDetails = 'Car Details';
 String driverName = 'Driver Name';
 String driverPhone = 'Driver Phone number';
 String tripStatusDisplay = 'Driver Arrival Time:';
+String driverID = '';
