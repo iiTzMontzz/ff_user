@@ -98,9 +98,7 @@ class _HomeState extends State<Home> {
                               image: 'assets/images/user.png',
                               onTap: () {
                                 Navigator.of(context).pop();
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        Splash(route: '/reciever')));
+                                Navigator.of(context).pushNamed('/myprofile');
                               },
                             ),
                           ],

@@ -8,6 +8,7 @@ import 'package:ff_user/screens_folder/_pages/__functions/_widgets/profile.dart'
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/wallet.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/pet_reciever.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_aNormal/ride_request.dart';
+import 'package:ff_user/screens_folder/_pages/_profile/profile.dart';
 import 'package:ff_user/wrapper_folder/driver.dart';
 import 'package:ff_user/wrapper_folder/onReview.dart';
 import 'package:ff_user/wrapper_folder/user_wrapper.dart';
@@ -30,4 +31,5 @@ final Map<String, WidgetBuilder> routes = {
   '/ridereq_pet': (BuildContext context) => RideRequest(rideType: 'Pet Only'),
   '/petreciever': (BuildContext context) => PetReciever(),
   '/home': (BuildContext context) => Home(),
+  '/myprofile': (BuildContext context) => MyProfile(),
 };
