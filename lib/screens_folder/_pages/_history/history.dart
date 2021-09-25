@@ -3,7 +3,10 @@ import 'package:ff_user/screens_folder/_pages/_history/history_page.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
+import 'package:ff_user/shared_folder/_global/glob_var.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 
 class History extends StatelessWidget {
   @override
@@ -45,8 +48,7 @@ class History extends StatelessWidget {
           FlatButton(
             padding: EdgeInsets.all(0),
             onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => HistoryPage()));
+              checkHistory(context);
             },
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -77,5 +79,21 @@ class History extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void checkHistory(context) {
+    DatabaseReference historef = FirebaseDatabase.instance
+        .reference()
+        .child('users/${currentUserinfo.uid}/history');
+
+    historef.once().then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => HistoryPage()));
+      } else {
+        Toast.show("No History Yet", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+      }
+    });
   }
 }
