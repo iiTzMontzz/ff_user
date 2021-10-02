@@ -11,6 +11,7 @@ final CameraPosition initialPosition = CameraPosition(
 FirebaseUser currentuser;
 UserData currentUserinfo;
 StreamSubscription<Position> tripPositionStream;
+LatLng driverLocation;
 bool geoStatus;
 String geoin;
 double starCounter = 0.0;

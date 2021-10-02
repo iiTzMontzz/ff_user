@@ -10,9 +10,11 @@ import 'package:ff_user/screens_folder/_pages/__functions/_widgets/car_type.dart
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/no_driver_available.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/payments_dialog.dart';
 import 'package:ff_user/screens_folder/_pages/__functions/_widgets/ratings.dart';
+import 'package:ff_user/screens_folder/_pages/__functions/_widgets/trip_cancelation.dart';
 import 'package:ff_user/services_folder/_database/app_data.dart';
 import 'package:ff_user/services_folder/_helper/fire_helper.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
+import 'package:ff_user/services_folder/_helper/map_kit_helper.dart';
 import 'package:ff_user/shared_folder/_buttons/divider.dart';
 import 'package:ff_user/shared_folder/_buttons/main_button.dart';
 import 'package:ff_user/shared_folder/_constants/progressDialog.dart';
@@ -63,8 +65,12 @@ class _RideRequestState extends State<RideRequest>
   bool isRequestingLocationDetails = false;
   bool showCancel = true;
   bool nearbyKeyisLoaded = false;
+  bool getLocation = true;
   int counter = 0;
   var geolocator = Geolocator();
+  var locationOptions =
+      LocationOptions(accuracy: LocationAccuracy.bestForNavigation);
+  BitmapDescriptor movingMarkerIcon;
 
   @override
   void initState() {
@@ -76,6 +82,7 @@ class _RideRequestState extends State<RideRequest>
   @override
   Widget build(BuildContext context) {
     createMarker();
+    createmovingMarker();
     return Scaffold(
       body: Stack(
         children: [
@@ -782,11 +789,24 @@ class _RideRequestState extends State<RideRequest>
                                             CrossAxisAlignment.center,
                                         children: [
                                           GestureDetector(
-                                            onTap: () {
-                                              tripRef
-                                                  .child('status')
-                                                  .set('Canceled');
-                                              resetapp();
+                                            onTap: () async {
+                                              var result = await showDialog(
+                                                  context: context,
+                                                  barrierDismissible: true,
+                                                  builder: (BuildContext
+                                                          context) =>
+                                                      TripCancelationDialog());
+                                              if (result == 'proceed') {
+                                                tripPositionStream.cancel();
+                                                tripPositionStream = null;
+                                                driverLocation = null;
+                                                tripRef
+                                                    .child('status')
+                                                    .set('Canceled');
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context)
+                                                    .pushNamed('/wrapper');
+                                              }
                                             },
                                             child: Container(
                                               height:
@@ -1145,7 +1165,11 @@ class _RideRequestState extends State<RideRequest>
             event.snapshot.value['driver_location']['lat'].toString());
         double driverLng = double.parse(
             event.snapshot.value['driver_location']['lng'].toString());
-        LatLng driverLocation = LatLng(driverLat, driverLng);
+        driverLocation = LatLng(driverLat, driverLng);
+        if (getLocation == true) {
+          getlocationUpdate();
+          getLocation = false;
+        }
         if (status == 'Accepted') {
           updateToPickup(driverLocation);
         } else if (status == 'Arrived') {
@@ -1153,8 +1177,8 @@ class _RideRequestState extends State<RideRequest>
             tripStatusDisplay = 'Driver has arrived';
           });
         } else if (status == 'OnTrip') {
-          showCancel = false;
           updateToDestination(driverLocation);
+          showCancel = false;
         }
       }
       //if Status is accepted
@@ -1167,6 +1191,7 @@ class _RideRequestState extends State<RideRequest>
         historyRef.set(true);
       }
       if (status == 'Ended') {
+        _markers.clear();
         if (event.snapshot.value['fare'] != null) {
           int fare = int.parse(event.snapshot.value['fare'].toString());
           var resposne = await showDialog(
@@ -1185,6 +1210,10 @@ class _RideRequestState extends State<RideRequest>
               tripRef = null;
               tripSubscription.cancel();
               tripSubscription = null;
+              tripPositionStream.cancel();
+              tripPositionStream = null;
+              getLocation = true;
+              driverLocation = null;
               resetapp();
               setState(() {
                 showCancel = true;
@@ -1203,6 +1232,44 @@ class _RideRequestState extends State<RideRequest>
     });
   }
 
+  //Create Moving Markers
+  void createmovingMarker() {
+    if (movingMarkerIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, 'assets/images/paw-print.png')
+          .then((icon) {
+        movingMarkerIcon = icon;
+      });
+    }
+  }
+
+  // /Get Location Update of the driver
+  void getlocationUpdate() {
+    LatLng oldPosition = LatLng(0, 0);
+    tripPositionStream = geolocator
+        .getPositionStream(locationOptions)
+        .listen((Position position) {
+      LatLng pos = LatLng(driverLocation.latitude, driverLocation.longitude);
+      var rotation = MapKitHelper.getMarkerRotation(oldPosition.latitude,
+          oldPosition.longitude, pos.latitude, pos.longitude);
+      Marker movingmarker = Marker(
+          markerId: MarkerId('moving'),
+          position: pos,
+          icon: movingMarkerIcon,
+          rotation: rotation,
+          infoWindow: InfoWindow(title: 'Current Location'));
+      setState(() {
+        CameraPosition cp = new CameraPosition(target: pos, zoom: 18);
+        mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
+        _markers.removeWhere((marker) => marker.markerId.value == 'moving');
+        _markers.add(movingmarker);
+      });
+      oldPosition = pos;
+    });
+  }
+
 //Updatting to destination time
   void updateToDestination(LatLng driverLocation) async {
     if (!isRequestingLocationDetails) {
@@ -1215,6 +1282,7 @@ class _RideRequestState extends State<RideRequest>
       if (thisDetails == null) {
         return;
       }
+
       setState(() {
         tripStatusDisplay = 'Arrival Time - ${thisDetails.durationText}';
       });
@@ -1298,11 +1366,11 @@ class _RideRequestState extends State<RideRequest>
       return;
     }
     print(
-        'Current Counter .... $counter and available drivers ${availableDrivers.length}');
+        'Current Counter .... $counter and available drivers before sending ${availableDrivers.length}');
     var driver = availableDrivers[counter];
     notifyDriver(driver);
     print(
-        'Update Counter .... $counter and available drivers ${availableDrivers.length}');
+        'Update Counter .... $counter and available drivers after sending ${availableDrivers.length}');
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
   }
 
@@ -1364,17 +1432,11 @@ class _RideRequestState extends State<RideRequest>
                 }
               });
               if (driverRequestTimedOut == 0) {
-                print('Current Counter .... $counter');
                 driverTripRef.set('timeout');
                 driverTripRef.onDisconnect();
                 driverRequestTimedOut = 10;
                 timer.cancel();
-                // int index = availableDrivers
-                //     .indexWhere((element) => element.key == nearbyDriver.key);
-                // availableDrivers.remove(index);
-                // print(
-                //     "Drive timed out Removed >>>>> $index and available drivers ${availableDrivers.length}");
-                //Find New Driver'
+                print('Current Counter timed out.... $counter');
                 findDriver();
               }
             });

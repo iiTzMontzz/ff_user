@@ -1,8 +1,8 @@
+import 'package:ff_user/screens_folder/_fronts/choose_rde_type.dart';
 import 'package:ff_user/screens_folder/_pages/_history/history.dart';
 import 'package:ff_user/services_folder/_helper/helper_method.dart';
 import 'package:ff_user/shared_folder/_constants/FadeAnimation.dart';
 import 'package:ff_user/shared_folder/_constants/size_config.dart';
-import 'package:ff_user/shared_folder/_constants/splash.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -86,10 +86,11 @@ class _HomeState extends State<Home> {
                               color: Colors.white,
                               image: 'assets/images/new_trip.png',
                               onTap: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        Splash(route: '/ridereq')));
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (BuildContext context) =>
+                                        ChooseRideType());
                               },
                             ),
                             buildPetCategory(
