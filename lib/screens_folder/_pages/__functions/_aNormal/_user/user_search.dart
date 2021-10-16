@@ -32,7 +32,7 @@ class _UserSearchState extends State<UserSearch> {
       body: Column(
         children: [
           Container(
-            height: getProportionateScreenHeight(240),
+            height: getProportionateScreenHeight(300),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -143,7 +143,7 @@ class _UserSearchState extends State<UserSearch> {
                                 contentPadding: EdgeInsets.only(
                                   left: 10,
                                   top: 10,
-                                  bottom: 10,
+                                  bottom: 15,
                                 ),
                               ),
                               style: TextStyle(

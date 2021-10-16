@@ -56,7 +56,7 @@ class _RideRequestState extends State<RideRequest>
   Set<Circle> _circles = {};
   String appState = 'Normal';
   double mapPadding = 0;
-  double searchSheet = 310;
+  double searchSheet = 340;
   double tripDetailSheet = 0;
   double loadingTrip = 0;
   double tripSheet = 0;
@@ -87,7 +87,8 @@ class _RideRequestState extends State<RideRequest>
       body: Stack(
         children: [
           GoogleMap(
-            padding: EdgeInsets.only(bottom: mapPadding),
+            padding: EdgeInsets.only(
+                bottom: getProportionateScreenHeight(mapPadding)),
             mapType: MapType.normal,
             initialCameraPosition: initialPosition,
             myLocationButtonEnabled: true,
@@ -874,8 +875,8 @@ class _RideRequestState extends State<RideRequest>
     await getDirections();
     setState(() {
       searchSheet = 0;
-      tripDetailSheet = 240;
-      mapPadding = 240;
+      tripDetailSheet = 280;
+      mapPadding = 280;
       isRequest = false;
     });
   }
@@ -884,8 +885,8 @@ class _RideRequestState extends State<RideRequest>
   void showTripsheet() {
     setState(() {
       loadingTrip = 0;
-      tripSheet = 310;
-      mapPadding = 310;
+      tripSheet = 340;
+      mapPadding = 340;
     });
   }
 
@@ -898,8 +899,8 @@ class _RideRequestState extends State<RideRequest>
       _circles.clear();
       tripDetailSheet = 0;
       loadingTrip = 0;
-      searchSheet = 310;
-      mapPadding = 310;
+      searchSheet = 340;
+      mapPadding = 340;
       isRequest = true;
       showTopnavi = true;
       tripSheet = 0;
@@ -918,7 +919,7 @@ class _RideRequestState extends State<RideRequest>
     _controller.complete(controller);
     mapController = controller;
     setState(() {
-      mapPadding = getProportionateScreenHeight(310);
+      mapPadding = getProportionateScreenHeight(340);
     });
     setupPositionLocator();
   }
@@ -1261,7 +1262,7 @@ class _RideRequestState extends State<RideRequest>
           rotation: rotation,
           infoWindow: InfoWindow(title: 'Current Location'));
       setState(() {
-        CameraPosition cp = new CameraPosition(target: pos, zoom: 18);
+        CameraPosition cp = new CameraPosition(target: pos, zoom: 19);
         mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
         _markers.removeWhere((marker) => marker.markerId.value == 'moving');
         _markers.add(movingmarker);
@@ -1366,11 +1367,11 @@ class _RideRequestState extends State<RideRequest>
       return;
     }
     print(
-        'Current Counter .... $counter and available drivers before sending ${availableDrivers.length}');
+        'Current Counter .... $counter and available drivers !!before sending ${availableDrivers.length}');
     var driver = availableDrivers[counter];
     notifyDriver(driver);
     print(
-        'Update Counter .... $counter and available drivers after sending ${availableDrivers.length}');
+        'Update Counter .... $counter and available drivers after!! sending ${availableDrivers.length}');
     print(' OYY DARA ANG IMONG DRIVER OHHH' + driver.key);
   }
 

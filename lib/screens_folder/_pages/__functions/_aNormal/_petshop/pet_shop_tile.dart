@@ -82,7 +82,6 @@ class PetShopTile extends StatelessWidget {
 
       Provider.of<AppData>(context, listen: false)
           .updateDestinationAddress(thisPlace);
-      print('HELOO >>>>>>>>> ' + thisPlace.placename);
 
       Navigator.of(context).pop('PetStore');
     }
